@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>in.gov.rera.citizen.survey</groupId>
-	<artifactId>reraCitizenSurvey</artifactId>
+	<artifactId>citizen-survey</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>reraCitizenSurvey</name>
+	<name>citizen-survey</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>

@@ -38,7 +38,7 @@ public class AllotteeAfsPdfRestController {
 	Environment env;
 	
 
-	@GetMapping("/execute-afs/{projetId}/{kycId}")
+	@GetMapping("/download-afs/{projetId}/{kycId}")
 	public void getFormFivePdfDtlById(@PathVariable("projetId")Long projetId,@PathVariable("kycId") Long kycId,
 			HttpServletResponse response)
 			throws Exception {
@@ -49,7 +49,7 @@ public class AllotteeAfsPdfRestController {
 		    	if(model.getStatus().equals(ReraConstants.APPROVED))
 		    	{
 		    		InputStream reraLogo=AllotteeAfsPdfRestController.class.getClassLoader().getResourceAsStream("static/images/RERA_Certificate_Logo.jpg");
-		   		    System.out.println("INput stream is::::::::::::::: "+reraLogo);
+		   		    System.out.println("input stream is::::::::::::::: "+reraLogo);
 		   		    byte[] bt=new byte[reraLogo.available()];
 		   		    reraLogo.read(bt);
 		   		    reraLogo.close();
@@ -57,7 +57,6 @@ public class AllotteeAfsPdfRestController {
 		    	}
 		    	else
 		    	{
-		    		
 		    	}
 		    	//Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		    }

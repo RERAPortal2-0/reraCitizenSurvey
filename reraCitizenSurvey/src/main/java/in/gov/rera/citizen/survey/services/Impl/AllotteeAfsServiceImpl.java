@@ -1,6 +1,9 @@
 package in.gov.rera.citizen.survey.services.Impl;
 
 import java.io.OutputStream;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
@@ -119,7 +122,6 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 		c0.setBorder(0);
 		return c0;
 	}
-	
 	private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
 	private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL, BaseColor.RED);
 	private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
@@ -139,16 +141,18 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 		Font clauseFont = new Font(Font.FontFamily.TIMES_ROMAN, 9, Font.NORMAL);
 		Font font1 = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
 		Font boldFont = new Font(Font.FontFamily.TIMES_ROMAN, 9f, Font.BOLD);
-		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment;filename=" + "Project-AFS" + ".pdf");
-		Font fontUL = new Font(Font.FontFamily.TIMES_ROMAN, 10f, Font.UNDERLINE);
-		Font itlaicfont = new Font(Font.FontFamily.TIMES_ROMAN, 11f, Font.ITALIC);
 		try {
+			
+			Format f = new SimpleDateFormat("dd-MM-yyyy");
+			String strDate = f.format(new Date());
 			ProjectRegistrationModel project = new ProjectRegistrationModel();
 			CitizenClaimModel chModel = citizenService.findById(kycId);
 			project = RestTamplateUtility.projectDtlP(projetId, property);
-            
 			Optional.of(project).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment;filename=" + chModel.getAllotteekyc()+strDate + ".pdf");
+		Font fontUL = new Font(Font.FontFamily.TIMES_ROMAN, 10f, Font.UNDERLINE);
+		Font itlaicfont = new Font(Font.FontFamily.TIMES_ROMAN, 11f, Font.ITALIC);
 			OutputStream out = response.getOutputStream();
 			PdfWriter writer = PdfWriter.getInstance(document, out);
 			writer.setPageEvent(new GreyBorder());
@@ -156,6 +160,32 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 			Paragraph p1 = new Paragraph(project.getProjectDetailsModel().getProjectName(), font1);
 			p1.setAlignment(Paragraph.ALIGN_CENTER);
 			document.add(p1);
+			if (project.getProjRegNo() != null) {
+				Paragraph p2 = new Paragraph("" + project.getProjRegNo(), smallBold);
+				p2.setAlignment(Paragraph.ALIGN_CENTER);
+				document.add(p2);
+			}
+			if (project.getProjectAckNo() != null) {
+				Paragraph p3 = new Paragraph("" + project.getProjectAckNo(), smallBold);
+				p3.setAlignment(Paragraph.ALIGN_CENTER);
+				document.add(p3);
+			}
+			
+			/*
+			 * PdfPTable table = new PdfPTable(4); PdfPCell cell = new PdfPCell(new
+			 * Phrase(" 1,1 "));
+			 * 
+			 * table.addCell(cell); PdfPCell cell23 = new PdfPCell(new
+			 * Phrase("multi 1,3 and 1,4")); cell23.setColspan(4); cell23.setRowspan(4);
+			 * table.addCell(cell23); cell = new PdfPCell(new Phrase(" 2,1 "));
+			 * 
+			 * table.addCell(cell); cell = new PdfPCell(new Phrase(" 2,1 "));
+			 * 
+			 * table.addCell(cell); cell = new PdfPCell(new Phrase(" 2,1 "));
+			 * 
+			 * table.addCell(cell); document.add(table);
+			 */
+			
 			String qrCodeText = project.getProjectDetailsModel().getProjectName() + ",\n" + chModel.getAllotteeName()
 					+ ",\n" + chModel.getBlockName()+",\n" + chModel.getFlatNumber() + ",\n" + chModel.getAllotteekyc();
 			BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrCodeText, 1000, 1000, null);
@@ -185,88 +215,58 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 				p4.setAlignment(Paragraph.ALIGN_LEFT);
 				document.add(p4);
 			}
-			if (project.getProjRegNo() != null) {
-				Paragraph p2 = new Paragraph("Project REG. No : " + project.getProjRegNo(), smallBold);
-				p2.setAlignment(Paragraph.ALIGN_LEFT);
-				document.add(p2);
-			}
-			if (project.getProjectAckNo() != null) {
-				Paragraph p3 = new Paragraph("Project ACK. No : " + project.getProjectAckNo(), smallBold);
-				p3.setAlignment(Paragraph.ALIGN_LEFT);
-				document.add(p3);
-			}
-
+	
 			document.add(Chunk.NEWLINE);
-
 			for (int i = 0; i < model.getAfsClauseList().size(); i++) {
 				ProjectAfsClauseModel m = model.getAfsClauseList().get(i);
 				String str = m.getClauseDtl();
 				str = str.replaceAll("\\<.*?\\>", "");
-				Paragraph p5 = new Paragraph((++i) + ".  " + str, clauseFont);
+				int j=i+1;
+				Paragraph p5 = new Paragraph((j) + ".  " + str, clauseFont);
 				p5.setAlignment(Paragraph.ALIGN_LEFT);
 				document.add(p5);
 			}
-
 			document.add(Chunk.NEWLINE);
 			document.add(Chunk.NEWLINE);
-			
-		      PdfPTable table = new PdfPTable(new float[] { 50, 50 });
-		        table.setWidthPercentage(100);
-		        table.getDefaultCell().setBorder(0);
-			
+		      PdfPTable table2 = new PdfPTable(new float[] { 50, 50 });
+		      table2.setTotalWidth(document.right(document.rightMargin())
+				    - document.left(document.leftMargin()));
+		      table2.getDefaultCell().setBorder(0);
 			if (project.getPromoterName() != null) {
-				table.addCell(new Phrase("Promoter Name : " + project.getPromoterName(),smallBold));
+				table2.addCell(new Phrase("Promoter Name : " + project.getPromoterName(),smallBold));
 			}
 			if (chModel.getAllotteeName() != null) {
-				table.addCell(createCellByAlignRight("Allottee Name : " + chModel.getAllotteeName()));
+				table2.addCell(createCellByAlignRight("Allottee Name : " + chModel.getAllotteeName()));
 			}
 			
 			if (project.getPromoterType() != null) {
-				table.addCell(new Phrase("Promoter Type : " + project.getPromoterType(),smallBold));
+				table2.addCell(new Phrase("Promoter Type : " + project.getPromoterType(),smallBold));
 			}
 			if (chModel.getBlockName() != null) {
-				table.addCell(createCellByAlignRight("Block Name : " + chModel.getBlockName()));
+				table2.addCell(createCellByAlignRight("Block Name : " + chModel.getBlockName()));
 			}
 			
 			if (project.getPromoteremailId() != null) {
-				table.addCell(new Phrase("Promoter EmailId : " + project.getPromoteremailId(),smallBold));
+				table2.addCell(new Phrase("Promoter EmailId : " + project.getPromoteremailId(),smallBold));
 			}
 			if (chModel.getFlatNumber() != null) {
-				table.addCell(createCellByAlignRight("Flat No : " + chModel.getFlatNumber()));
+				table2.addCell(createCellByAlignRight("Flat No : " + chModel.getFlatNumber()));
 			}
 			
 			if (project.getPromoterMobileNo() != null) {
-				table.addCell(new Phrase("Promoter Mobile No. : " + project.getPromoterMobileNo(),normalFont));
+				table2.addCell(new Phrase("Promoter Mobile No. : " + project.getPromoterMobileNo(),smallBold));
 			}
 			if (chModel.getAllotteekyc() != null) {
-				table.addCell(createCellByAlignRight("KYC No. : " + chModel.getAllotteekyc()));
+				table2.addCell(createCellByAlignRight("KYC No. : " + chModel.getAllotteekyc()));
 			}
-			 document.add(table);
-			/*
-			 * Paragraph p7 = new
-			 * Paragraph(project.getProjectDetailsModel().getProjectName(), normalFont);
-			 * p7.setAlignment(Paragraph.ALIGN_RIGHT); document.add(p7);
-			 */
-			
-		
-		
-			
-			
-			
-			
+			table2.writeSelectedRows(0, -1,
+				    document.left(0),
+				    table2.getTotalHeight() + document.bottom(document.bottomMargin()),
+				    writer.getDirectContent());
 			document.close();
-
-			// model=dmsService.commitDoc(formFiveModel.getFormFiveDocModel(),
-			// env.getProperty("URL_CREATE_VDMS"));
-
 			writer.close();
 		} catch (Exception e) {
-
 		}
-		
-		
-		
-		
 	}
 
 	class GreyBorder extends PdfPageEventHelper {
@@ -284,18 +284,19 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 				canvas1.setGState(state);
 				canvas1.addImage(image);
 				canvas1.restoreState();
-				canvas1 = writer.getDirectContent();
+				
+				PdfContentByte canvas = writer.getDirectContent();
+				//canvas1 = writer.getDirectContent();
+				
 				Rectangle rect = new Rectangle(20, 20, 580, 830);
 				rect.setBorder(Rectangle.BOX); //
-				rect.setBorderColor(new BaseColor(192, 0, 0));
+				//rect.setBorderColor(new BaseColor(192, 0, 0));
 				rect.setBorderColor(BaseColor.GRAY);
 				rect.setBorderWidth(2);
-				canvas1.rectangle(rect);
+				canvas.rectangle(rect);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 			}
 		}
-
 	}
-
 }

@@ -27,7 +27,7 @@ public class TopicLikesModel {
 	private Long topicId;
 	
 	@Column(name="LIKED_BY_ID")
-	private String likedById;
+	private Long likedById;
 	
 	@Column(name="LIKED_BY_TYPE")
 	private String likedByType;
@@ -40,12 +40,12 @@ public class TopicLikesModel {
 
 	@Column(name="LIKED_BY_EMAID_ID")
 	private String likedByEmailId;
-	
-	public String getLikedById() {
+
+	public Long getLikedById() {
 		return likedById;
 	}
 
-	public void setLikedById(String likedById) {
+	public void setLikedById(Long likedById) {
 		this.likedById = likedById;
 	}
 

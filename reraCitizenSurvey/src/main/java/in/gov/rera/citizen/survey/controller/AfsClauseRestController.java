@@ -85,7 +85,6 @@ public class AfsClauseRestController {
 			throws ResourceNotFoundException {
 		Optional.ofNullable(model)
 				.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
-		System.out.println("saveAfsClause called");
 		   if(model.getAfsClauseId()==null) {
 		    model = afsService.saveAfs(model);
 		    model.setClauseCode(afsService.generateClauseCode(model.getAfsClauseId()));

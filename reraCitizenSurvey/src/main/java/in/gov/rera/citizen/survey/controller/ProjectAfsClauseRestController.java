@@ -67,6 +67,7 @@ public class ProjectAfsClauseRestController {
 		rs.setStatus("200");
 		rs.setData(model);
 		return ResponseEntity.ok().body(rs);
+		
 	}
 
 	@PostMapping("/save")
@@ -116,16 +117,5 @@ public class ProjectAfsClauseRestController {
 		rs.setData(model);
 		return ResponseEntity.ok().body(rs);
 	}
-
-	/*
-	 * @PostMapping("/delete{id}") public ResponseEntity<?>
-	 * deleteBankDtl(@PathVariable(value = "id") Long id) throws
-	 * ResourceNotFoundException { Optional.ofNullable(id) .orElseThrow(() -> new
-	 * ResourceNotFoundException(env.getProperty("DATA_INVALID")));
-	 * afsService.deleteById(id); ResponseModel rs = new ResponseModel();
-	 * rs.setMessage("Records Deleted."); rs.setStatus("200");
-	 * rs.setData("AFS Clause Details Deleted Successfully"); return
-	 * ResponseEntity.ok().body(rs); }
-	 */
 
 }

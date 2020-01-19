@@ -57,7 +57,6 @@ public class GenericNotificationRestController {
 	@GetMapping("/get-by-id{id}")
 	public ResponseEntity<?> getAfsDetailsById(@PathVariable(value = "id") Long id)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called id is " + id);
 		GenericNotificationModel model = service.findById(id);
 		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
@@ -70,7 +69,6 @@ public class GenericNotificationRestController {
 	@GetMapping("/get-by-process-id/{processId}")
 	public ResponseEntity<?> getNotificationByProcessId(@PathVariable(value = "processId") String processId)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called clauseCode is " + processId);
 		GenericNotificationModel model = service.findByProcessId(processId);
 		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
@@ -83,22 +81,19 @@ public class GenericNotificationRestController {
 	@GetMapping("/get-by-process-type/{processType}")
 	public ResponseEntity<?> getNotificationByProcessType(@PathVariable(value = "processType") String processType)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called clauseCode is " + processType);
-		GenericNotificationModel model = service.findByProcessId(processType);
-		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		List<GenericNotificationModel> list = service.findByProcessType(processType);
+		Optional.of(list).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Records found.");
 		rs.setStatus("200");
-		rs.setData(model);
+		rs.setData(list);
 		return ResponseEntity.ok().body(rs);
 	}
 	
 	@PostMapping("/save")
 	public ResponseEntity<?> saveAfsClause(@RequestBody GenericNotificationModel model)
 			throws ResourceNotFoundException {
-		Optional.ofNullable(model)
-				.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
-		System.out.println("saveAfsClause called");
+		Optional.ofNullable(model).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
 		model = service.save(model);
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Data submitted Successfully.");
@@ -106,16 +101,5 @@ public class GenericNotificationRestController {
 		rs.setData(model);
 		return ResponseEntity.ok().body(rs);
 	}
-
-	/*
-	 * @PostMapping("/delete{id}") public ResponseEntity<?>
-	 * deleteBankDtl(@PathVariable(value = "id") Long id) throws
-	 * ResourceNotFoundException { Optional.ofNullable(id) .orElseThrow(() -> new
-	 * ResourceNotFoundException(env.getProperty("DATA_INVALID")));
-	 * afsService.deleteById(id); ResponseModel rs = new ResponseModel();
-	 * rs.setMessage("Records Deleted."); rs.setStatus("200");
-	 * rs.setData("AFS Clause Details Deleted Successfully"); return
-	 * ResponseEntity.ok().body(rs); }
-	 */
 
 }

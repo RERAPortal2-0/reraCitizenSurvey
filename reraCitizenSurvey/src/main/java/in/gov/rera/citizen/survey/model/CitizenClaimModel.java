@@ -27,7 +27,7 @@ public class CitizenClaimModel {
 	@Column(name="PROJECT_NAME")
 	private String projectName;
 	
-	@Column(name="NAME_NAME")
+	@Column(name="ALLOTTEE_NAME")
 	private String allotteeName;
 
 	public String getAllotteeName() {
@@ -38,7 +38,7 @@ public class CitizenClaimModel {
 		this.allotteeName = allotteeName;
 	}
 
-	@Column(name="ALLOTTEE_KYC", length = 500)
+	@Column(name="ALLOTTEE_KYC")
 	private String allotteekyc;
 	
 	@Column(name="BLOCK_NAME")
@@ -61,6 +61,9 @@ public class CitizenClaimModel {
 	
 	@Column(name="USER_TYPE")
 	private String userType;
+	
+	@Column(name="PROJECT_REG_NO")
+	private String projectRegNo;
 	
 	@CreationTimestamp
 	@Temporal(TemporalType.TIMESTAMP)

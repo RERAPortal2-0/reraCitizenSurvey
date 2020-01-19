@@ -2,8 +2,12 @@ package in.gov.rera.citizen.survey.controller;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.ResourceAccessException;
 import in.gov.rera.citizen.survey.common.model.ResponseModel;
+import in.gov.rera.citizen.survey.constants.ReraConstants;
 import in.gov.rera.citizen.survey.exception.ResourceNotFoundException;
-import in.gov.rera.citizen.survey.model.AfsClauseModel;
 import in.gov.rera.citizen.survey.model.CitizenClaimModel;
-import in.gov.rera.citizen.survey.services.AfsClauseService;
+import in.gov.rera.citizen.survey.security.AuthUser;
 import in.gov.rera.citizen.survey.services.CitizenClaimService;
 
 @PropertySource(ignoreResourceNotFound = true, value = "classpath:message/common.properties")
@@ -43,12 +47,9 @@ public class CitizenClaimRestController {
 		List<CitizenClaimModel> list = service.findAll();
 		Optional.of(list).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
-		if(list.size()>0)
-		{
-			rs.setMessage("Records found.");
-		}
-		else
-		{
+		if (list.size()>0) {
+			rs.setMessage("Records found");
+		} else {
 			rs.setMessage("Record not exists");
 		}
 		rs.setStatus("200");
@@ -59,7 +60,6 @@ public class CitizenClaimRestController {
 	@GetMapping("/get-by-id{id}")
 	public ResponseEntity<?> getAfsDetailsById(@PathVariable(value = "id") Long id)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called id is " + id);
 		CitizenClaimModel model = service.findById(id);
 		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
@@ -68,11 +68,10 @@ public class CitizenClaimRestController {
 		rs.setData(model);
 		return ResponseEntity.ok().body(rs);
 	}
-	
+
 	@GetMapping("/get-all-by-projectid{projectId}")
 	public ResponseEntity<?> getAllProjectAfsList(@PathVariable(value = "projectId") Long projectId)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called id is " + projectId);
 		List<CitizenClaimModel> list = service.findByProjectId(projectId);
 		Optional.of(list).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
@@ -82,10 +81,28 @@ public class CitizenClaimRestController {
 		return ResponseEntity.ok().body(rs);
 	}
 
+	/************************************************************************************************
+	 * get all block details
+	 ************************************************************************************************/
+	@GetMapping("/get-project-all-block{projectId}")
+	public ResponseEntity<?> getProjectAllBlockList(@PathVariable(value = "projectId") Long projectId) {
+		logger.debug("called id is");
+		ResponseModel rs = new ResponseModel();
+		List<CitizenClaimModel> citizenList = service.findByProjectId(projectId);
+		HashMap<String,HashSet> btrDtl=new HashMap<String, HashSet>();
+		if (Optional.ofNullable(citizenList).isPresent()) {
+			btrDtl=service.getBlockDetails(citizenList);
+		}
+		rs.setMessage("Records found.");
+		rs.setStatus("200");
+		rs.setData(btrDtl);
+		return ResponseEntity.ok().body(btrDtl);
+	}
+
 	@GetMapping("/get-by-kyc/{kyc}")
 	public ResponseEntity<?> getAfsDetailsByclauseCode(@PathVariable(value = "kyc") String kyc)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called clauseCode is " + kyc);
+		logger.debug("called clauseCode is");
 		CitizenClaimModel model = service.findByKyc(kyc);
 		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
@@ -95,14 +112,77 @@ public class CitizenClaimRestController {
 		return ResponseEntity.ok().body(rs);
 	}
 	
+	@GetMapping("/get-claimed-citizen-list/{userId}/{userType}")
+	public ResponseEntity<?> getClaimedCitizenDtl(@PathVariable(value = "userId") String userId,@PathVariable(value = "userType") String userType)
+			throws ResourceNotFoundException, IOException, ParseException {
+		logger.debug("called clauseCode is");
+		List<CitizenClaimModel> list = service.findByUserType(userType);
+		List<CitizenClaimModel> newList = new ArrayList<CitizenClaimModel>();
+		Optional.of(list).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		for(CitizenClaimModel m:list)
+		{
+			if(m.getUserId().equals(userId))
+			{
+				newList.add(m);
+			}
+		}
+		ResponseModel rs = new ResponseModel();
+		rs.setMessage("Records found.");
+		rs.setStatus("200");
+		rs.setData(newList);
+		return ResponseEntity.ok().body(rs);
+	}
+
+	@GetMapping("/flat-list/{projectId}/{blockName}")
+	public ResponseEntity<?> getFlatDetails(@PathVariable(value = "projectId") Long projectId,@PathVariable(value = "blockName") String blockName)
+			throws ResourceNotFoundException, IOException, ParseException {
+		logger.debug("called clauseCode is");
+		List<CitizenClaimModel> list = service.findByProjectId(projectId);
+		List<CitizenClaimModel> newList = new ArrayList<CitizenClaimModel>();
+		Optional.of(list).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		for(CitizenClaimModel m:list)
+		{
+			if(blockName.equals(m.getBlockName()))
+			{
+				newList.add(m);
+			}
+		}
+		ResponseModel rs = new ResponseModel();
+		rs.setMessage("Records found.");
+		rs.setStatus("200");
+		rs.setData(newList);
+		return ResponseEntity.ok().body(rs);
+	}
 	
+	
+	@GetMapping("/allottee-flat-list/{projectId}/{userId}/{userType}")
+	public ResponseEntity<?> getCitizenFlatList(@PathVariable(value = "projectId") Long projectId,
+			@PathVariable(value = "userId") String userId
+			,@PathVariable(value = "userType") String userType)
+			throws ResourceNotFoundException, IOException, ParseException {
+		System.out.println("called clauseCode is"+userId);
+		List<CitizenClaimModel> list = service.findByProjectId(projectId);
+		System.out.println("List size is "+list.size());
+		List<CitizenClaimModel> newList = new ArrayList<CitizenClaimModel>();
+		Optional.of(list).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		for(CitizenClaimModel m:list)
+		{
+			if(m.getUserId().equals(userId) && m.getUserType().equals(userType))
+			{
+				newList.add(m);
+			}
+		}
+		ResponseModel rs = new ResponseModel();
+		rs.setMessage("Records found.");
+		rs.setStatus("200");
+		rs.setData(newList);
+		return ResponseEntity.ok().body(rs);
+	}
 	
 	@PostMapping("/save")
-	public ResponseEntity<?> saveAfsClause(@RequestBody CitizenClaimModel model)
-			throws ResourceNotFoundException {
-		Optional.ofNullable(model)
-				.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
-		    model = service.save(model);
+	public ResponseEntity<?> saveAfsClause(@RequestBody CitizenClaimModel model) throws ResourceNotFoundException {
+		Optional.ofNullable(model).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+		model = service.save(model);
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Data submitted Successfully.");
 		rs.setStatus("200");
@@ -110,53 +190,58 @@ public class CitizenClaimRestController {
 		return ResponseEntity.ok().body(rs);
 	}
 
+	@PostMapping("/execute-afs")
+	public ResponseEntity<?> saveExecuteAfs(@RequestBody CitizenClaimModel model) throws ResourceNotFoundException {
+		Optional.ofNullable(model).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+		CitizenClaimModel newModel=new CitizenClaimModel();
+		newModel = service.findById(model.getCitizenClaimId());
+		Optional.ofNullable(model).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("AFS ID NOT FOUND")));
+		newModel.setAfsStatus(ReraConstants.YES);
+		newModel = service.save(newModel);
+		ResponseModel rs = new ResponseModel();
+		rs.setMessage("AFS Status updated Successfully.");
+		rs.setStatus("200");
+		rs.setData(newModel);
+		return ResponseEntity.ok().body(rs);
+	}
+
 	@PostMapping("/validate-kyc")
 	public ResponseEntity<?> validateAllotteeKyc(@RequestBody CitizenClaimModel model)
 			throws ResourceNotFoundException {
-		Optional.ofNullable(model)
-				.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
-		CitizenClaimModel returnModel=new CitizenClaimModel();
-		List<CitizenClaimModel> kycList=service.findByProjectId(model.getProjectId());
-		if(kycList.size()>0)
-		{
+		Optional.ofNullable(model).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+		CitizenClaimModel returnModel=  null;
+		List<CitizenClaimModel> kycList = service.findByProjectId(model.getProjectId());
+		if (kycList.size()> 0) {
 			System.out.println("inside list:::::::::::::::::::");
-			for(CitizenClaimModel m:kycList)
-			{
-			    if(m.getAllotteekyc().equals(model.getAllotteekyc()) 
-			    		&& m.getBlockName().equals(model.getBlockName())
-			    		&& m.getFlatNumber().equals(model.getFlatNumber()))	
-			    {
-			    	returnModel=m;
-			    }
+			for (CitizenClaimModel m : kycList) {
+				if (m.getAllotteekyc().equalsIgnoreCase(model.getAllotteekyc()) && m.getBlockName().equalsIgnoreCase(model.getBlockName())
+						&& m.getFlatNumber().equalsIgnoreCase(model.getFlatNumber())) {
+					returnModel=new CitizenClaimModel();
+					returnModel = m;
+				}
 			}
 		}
 		ResponseModel rs = new ResponseModel();
-		if(!returnModel.equals(null)) {
-		rs.setMessage("Data matched Successfully.");
-		rs.setStatus("200");
-		rs.setData(returnModel);
-		}
-		else
-		{
+		if (returnModel!=null) {
+			rs.setMessage("Data matched Successfully.");
+			rs.setStatus("200");
+			rs.setData(returnModel);
+		} else {
 			rs.setMessage("Data not matched.");
 			rs.setStatus("404");
-			rs.setData("");
+			rs.setData("Not Matched");
 		}
 		return ResponseEntity.ok().body(rs);
 	}
-	
+
 	@PostMapping("/delete{id}")
-	public ResponseEntity<?> deleteBankDtl(@PathVariable(value = "id") Long id)
-			throws ResourceNotFoundException {
-		Optional.ofNullable(id)
-				.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+	public ResponseEntity<?> deleteBankDtl(@PathVariable(value = "id") Long id) throws ResourceNotFoundException {
+		Optional.ofNullable(id).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
 		service.deleteById(id);
 		ResponseModel rs = new ResponseModel();
-		
 		rs.setMessage("Records Deleted.");
 		rs.setStatus("200");
 		rs.setData("AFS Clause Details Deleted Successfully");
 		return ResponseEntity.ok().body(rs);
 	}
-
 }

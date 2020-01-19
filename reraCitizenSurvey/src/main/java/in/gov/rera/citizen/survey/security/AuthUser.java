@@ -139,6 +139,4 @@ public class AuthUser {
 		this.department = department;
 	}
 
-	
-	
 }

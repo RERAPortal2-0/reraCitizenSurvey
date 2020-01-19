@@ -267,5 +267,7 @@ public class ReraConstants {
 	public static final String SENT="SENT";
 	
 	public static final String SAVEASDRAFT="SAVEASDRAFT";
+
+	public static final String YES = "YES";
 	
 }

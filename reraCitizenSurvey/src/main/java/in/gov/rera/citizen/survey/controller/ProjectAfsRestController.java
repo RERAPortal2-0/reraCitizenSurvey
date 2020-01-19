@@ -44,11 +44,10 @@ public class ProjectAfsRestController {
 	@GetMapping("/get-by-id{id}")
 	public ResponseEntity<?> getProjectAfsDetailsById(@PathVariable(value = "id") Long id)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called id is " + id);
 		ProjectAfsModel model = afsService.findById(id);
 		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
-		rs.setMessage("Records found.");
+		rs.setMessage("Records found");
 		rs.setStatus("200");
 		rs.setData(model);
 		return ResponseEntity.ok().body(rs);
@@ -57,7 +56,6 @@ public class ProjectAfsRestController {
 	@GetMapping("/get-by-project-id{projectId}")
 	public ResponseEntity<?> getProjectAfsDetailsByProjectId(@PathVariable(value = "projectId") Long projectId)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called id is " + projectId);
 		List<ProjectAfsModel> model = afsService.findByProjectId(projectId);
 		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
@@ -86,14 +84,27 @@ public class ProjectAfsRestController {
 		logger.debug("saveAfsClause called");
 		if (model.getStatus().equals(ReraConstants.PENDING_WITH_AUTH)) {
 			model = afsService.findById(model.getProjectAfsId());
-			model.setStatus(ReraConstants.PENDING_WITH_AUTH);
+			int i=0;
+			for(ProjectAfsClauseModel m:model.getAfsClauseList())
+			{
+				if(m.getAction()!=null)
+				{
+					i=1;
+				}
+			}
+			if(i==1) {
+				model.setStatus(ReraConstants.APPROVED);
+			}
+			else
+			{
+				model.setStatus(ReraConstants.PENDING_WITH_AUTH);
+			}
 			model.setAuthRemarks("");
 			model = afsService.saveProjectAfs(model);
 		} else if (model.getStatus().equals(ReraConstants.REVIEW)) {
 			ProjectAfsModel isPresent = new ProjectAfsModel();
 			isPresent = afsService.findById(model.getProjectAfsId());
-			Optional.ofNullable(isPresent)
-					.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("ID IS NOT PRESENT")));
+			Optional.ofNullable(isPresent).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("ID IS NOT PRESENT")));
 			model = afsService.saveProjectAfs(model);
 			ProjectAfsModel newModel = new ProjectAfsModel();
 			List<ProjectAfsClauseModel> newChlList = new ArrayList<ProjectAfsClauseModel>();
