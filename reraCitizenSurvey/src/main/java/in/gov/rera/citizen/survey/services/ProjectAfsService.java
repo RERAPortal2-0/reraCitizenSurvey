@@ -21,5 +21,7 @@ public interface ProjectAfsService {
 
 	void generateProjeAfsPdf(ProjectAfsModel model, HttpServletResponse response, Long projetId, String property);
 
+	List<ProjectAfsModel> findByAfsLogByProjectId(Long projectId);
+
 	
 }

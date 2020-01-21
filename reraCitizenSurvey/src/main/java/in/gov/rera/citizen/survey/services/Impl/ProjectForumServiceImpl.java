@@ -37,27 +37,21 @@ public class ProjectForumServiceImpl implements ProjectForumService {
 	Environment env;
 
 	@Override
-	public ProjectForumModel findByProjectId(Long projectId, String projectDtlUrl) {
-		ProjectForumModel pForumModel = new ProjectForumModel();
-		try {
-		pForumModel = projectFormDao.findByProjectId(projectId);
-		if (null == pForumModel) {
-			 ProjectRegistrationModel project = RestTamplateUtility.projectDtlP(projectId, projectDtlUrl);
-				Optional.of(project).orElseThrow(() -> new ResourceAccessException("NOT FOUND"));
-				logger.debug("project details are " + project);
-				pForumModel=new ProjectForumModel();
-				pForumModel.setProjectId(project.getProjRegId());
-				pForumModel.setProjectName(project.getProjectDetailsModel().getProjectName());
-				pForumModel.setPromoterName(project.getPromoterName());
-				pForumModel.setForumName(project.getProjectDetailsModel().getProjectName());
-				pForumModel = projectFormDao.save(pForumModel);
-			} 
-		 else {
-		 }
-		}
-		catch (ResourceNotFoundException e) {
-			e.printStackTrace();
-		}
+	public ProjectForumModel findByProjectId(Long projectId) {
+		/*
+		 * ProjectForumModel pForumModel = new ProjectForumModel(); try { pForumModel =
+		 * projectFormDao.findByProjectId(projectId); if (null == pForumModel) {
+		 * ProjectRegistrationModel project = RestTamplateUtility.projectDtlP(projectId,
+		 * projectDtlUrl); Optional.of(project).orElseThrow(() -> new
+		 * ResourceAccessException("NOT FOUND")); logger.debug("project details are " +
+		 * project); pForumModel=new ProjectForumModel();
+		 * pForumModel.setProjectId(project.getProjRegId());
+		 * pForumModel.setProjectName(project.getProjectDetailsModel().getProjectName())
+		 * ; pForumModel.setPromoterName(project.getPromoterName());
+		 * pForumModel.setForumName(project.getProjectDetailsModel().getProjectName());
+		 * pForumModel = projectFormDao.save(pForumModel); } else { } } catch
+		 * (ResourceNotFoundException e) { e.printStackTrace(); }
+		 */
 		return projectFormDao.findByProjectId(projectId);
 	}
 

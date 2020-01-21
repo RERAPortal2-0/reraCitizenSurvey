@@ -26,6 +26,8 @@ import in.gov.rera.citizen.survey.common.model.ResponseModel;
 import in.gov.rera.citizen.survey.constants.ReraConstants;
 import in.gov.rera.citizen.survey.exception.ResourceNotFoundException;
 import in.gov.rera.citizen.survey.model.CitizenClaimModel;
+import in.gov.rera.citizen.survey.model.FormThreeAlloModel;
+import in.gov.rera.citizen.survey.model.FormThreeAnnxrTrxModel;
 import in.gov.rera.citizen.survey.security.AuthUser;
 import in.gov.rera.citizen.survey.services.CitizenClaimService;
 
@@ -178,11 +180,20 @@ public class CitizenClaimRestController {
 		rs.setData(newList);
 		return ResponseEntity.ok().body(rs);
 	}
-	
+	/*
+	 * 
+	 * Data will come from Form-3
+	 * 
+	 */
 	@PostMapping("/save")
 	public ResponseEntity<?> saveAfsClause(@RequestBody CitizenClaimModel model) throws ResourceNotFoundException {
 		Optional.ofNullable(model).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+		
+		CitizenClaimModel oldModel = service.findById(model.getCitizenClaimId());
+		if(oldModel!=null)
+		{
 		model = service.save(model);
+		}
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Data submitted Successfully.");
 		rs.setStatus("200");
@@ -190,6 +201,45 @@ public class CitizenClaimRestController {
 		return ResponseEntity.ok().body(rs);
 	}
 
+	
+	@PostMapping("/save-allottee-details")
+	public ResponseEntity<?> saveAllotteeDetails(@RequestBody List<FormThreeAnnxrTrxModel> projectList) throws ResourceNotFoundException {
+		Optional.ofNullable(projectList).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+		for(FormThreeAnnxrTrxModel m: projectList)
+		{
+			List<CitizenClaimModel> citizenList = service.findByProjectId(m.getProjectId());
+			for(FormThreeAlloModel alo:m.getAllolist())
+			{
+				int flag=0;
+				for(CitizenClaimModel model :citizenList)
+				{
+					if(!model.getProjectId().equals(m.getProjectId()) && !model.getBlockName().equals(alo.getBlockName()) && 
+					!model.getFlatNumber().equals(alo.getFlatNumber()) && 
+					!model.getAllotteekyc().equals(alo.getAllotteekyc()))
+					{
+						flag=1;
+					}
+				}
+				if(flag==1)
+				{
+					CitizenClaimModel newModel = new CitizenClaimModel();
+					newModel.setAllotteekyc(alo.getAllotteekyc());
+					newModel.setBlockName(alo.getBlockName());
+					newModel.setProjectId(m.getProjectId());
+					newModel.setProjectRegNo(m.getProjectReg());
+					newModel.setFlatNumber(alo.getFlatNumber());
+					newModel.setMobileNumber(alo.getMobileNumber());
+					service.save(newModel);
+				}
+			}
+		}
+		ResponseModel rs = new ResponseModel();
+		rs.setMessage("Data submitted Successfully.");
+		rs.setStatus("200");
+		rs.setData("");
+		return ResponseEntity.ok().body(rs);
+	}
+	
 	@PostMapping("/execute-afs")
 	public ResponseEntity<?> saveExecuteAfs(@RequestBody CitizenClaimModel model) throws ResourceNotFoundException {
 		Optional.ofNullable(model).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));

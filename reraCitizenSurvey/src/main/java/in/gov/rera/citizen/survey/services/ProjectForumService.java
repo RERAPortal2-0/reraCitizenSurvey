@@ -6,7 +6,7 @@ public interface ProjectForumService {
 
 	ProjectForumModel saveProjectForum(ProjectForumModel model);
 
-	ProjectForumModel findByProjectId(Long projectId, String projectDtlUrl);
+	ProjectForumModel findByProjectId(Long projectId);
     
 	ProjectForumModel findById(Long id);
 }

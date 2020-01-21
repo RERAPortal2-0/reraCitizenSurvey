@@ -43,6 +43,17 @@ public class ProjectForumModel implements Serializable {
 	@Column(name="PROMOTER_NAME")
 	private String promoterName;
 	
+	@Column(name="STATUS")
+	private String status;
+	
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	@CreationTimestamp
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATED_ON")

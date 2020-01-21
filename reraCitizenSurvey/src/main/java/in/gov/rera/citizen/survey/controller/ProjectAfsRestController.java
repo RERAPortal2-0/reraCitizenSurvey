@@ -64,6 +64,39 @@ public class ProjectAfsRestController {
 		rs.setData(model);
 		return ResponseEntity.ok().body(rs);
 	}
+	
+	
+	
+	@GetMapping("/get-project-afs-log/{projectId}")
+	public ResponseEntity<?> getProjectAfsLogDetailsByProjectId(@PathVariable(value = "projectId") Long projectId)
+			throws ResourceNotFoundException, IOException, ParseException {
+		List<ProjectAfsModel> list = afsService.findByAfsLogByProjectId(projectId);
+		List<ProjectAfsModel> logList = new ArrayList<ProjectAfsModel>();
+		ResponseModel rs = new ResponseModel();
+		for(int i=list.size()-1;i>=0;i--)
+		{
+			ProjectAfsModel m = list.get(i);
+			if(m.getAfsLogId()!=null)
+			{
+				m.setAfsClauseList(null);
+				logList.add(m);
+			}
+		}
+		if(logList.size()>0)
+		{
+			rs.setMessage("Log Found.");
+			rs.setStatus("200");
+			rs.setData(logList);
+		}
+		else
+		{
+			rs.setMessage("No Log Found.");
+			rs.setStatus("404");
+			rs.setData("");
+		}
+		return ResponseEntity.ok().body(rs);
+	}
+	
 
 	@GetMapping("/get-all-by-status{status}")
 	public ResponseEntity<?> getProjectAfsDetailsByStatus(@PathVariable(value = "status") String status)
@@ -82,22 +115,26 @@ public class ProjectAfsRestController {
 	public ResponseEntity<?> saveAfsClause(@RequestBody ProjectAfsModel model) throws ResourceNotFoundException {
 		Optional.ofNullable(model).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
 		logger.debug("saveAfsClause called");
-		if (model.getStatus().equals(ReraConstants.PENDING_WITH_AUTH)) {
+		if (model.getStatus().equals(ReraConstants.APPROVED)) {
+			model = afsService.saveProjectAfs(model);
+		}
+		
+		else if (model.getStatus().equals(ReraConstants.PENDING_WITH_AUTH)) {
 			model = afsService.findById(model.getProjectAfsId());
 			int i=0;
 			for(ProjectAfsClauseModel m:model.getAfsClauseList())
 			{
-				if(m.getAction()!=null)
+				if(!"".equals(m.getAction()))
 				{
 					i=1;
 				}
 			}
 			if(i==1) {
-				model.setStatus(ReraConstants.APPROVED);
+				model.setStatus(ReraConstants.PENDING_WITH_AUTH);
 			}
 			else
 			{
-				model.setStatus(ReraConstants.PENDING_WITH_AUTH);
+				model.setStatus(ReraConstants.APPROVED);
 			}
 			model.setAuthRemarks("");
 			model = afsService.saveProjectAfs(model);
@@ -136,9 +173,7 @@ public class ProjectAfsRestController {
 			}
 			newModel.setAfsClauseList(newChlList);
 			model = afsService.saveProjectAfs(newModel);
-		} else if (model.getStatus().equals(ReraConstants.APPROVED)) {
-			model = afsService.saveProjectAfs(model);
-		}
+		} 
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Data submitted Successfully.");
 		rs.setStatus("200");

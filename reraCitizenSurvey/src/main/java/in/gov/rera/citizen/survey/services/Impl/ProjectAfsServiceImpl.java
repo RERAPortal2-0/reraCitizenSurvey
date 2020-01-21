@@ -297,6 +297,11 @@ public class ProjectAfsServiceImpl implements ProjectAfsService {
 
 	}
 
+	@Override
+	public List<ProjectAfsModel> findByAfsLogByProjectId(Long projectId) {
+		return afsDao.findByProjectId(projectId);
+	}
+
 }
 
 class GreyBorder extends PdfPageEventHelper {

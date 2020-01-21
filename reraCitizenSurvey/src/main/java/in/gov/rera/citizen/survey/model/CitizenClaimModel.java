@@ -65,6 +65,14 @@ public class CitizenClaimModel {
 	@Column(name="PROJECT_REG_NO")
 	private String projectRegNo;
 	
+	public String getProjectRegNo() {
+		return projectRegNo;
+	}
+
+	public void setProjectRegNo(String projectRegNo) {
+		this.projectRegNo = projectRegNo;
+	}
+
 	@CreationTimestamp
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "CREATED_ON")
