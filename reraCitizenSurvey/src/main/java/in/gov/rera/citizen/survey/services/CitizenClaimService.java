@@ -27,4 +27,6 @@ public interface CitizenClaimService {
 
 	List<CitizenClaimModel> findByUserType(String userType);
 
+	List<CitizenClaimModel> findByProjectRegNo(String projectRegNo);
+
 }

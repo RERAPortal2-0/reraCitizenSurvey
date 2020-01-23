@@ -5,6 +5,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,8 @@ import org.springframework.web.client.ResourceAccessException;
 import in.gov.rera.citizen.survey.common.model.ResponseModel;
 import in.gov.rera.citizen.survey.exception.ResourceNotFoundException;
 import in.gov.rera.citizen.survey.model.AllotteeForumTopicModel;
+import in.gov.rera.citizen.survey.security.AuthSecurity;
+import in.gov.rera.citizen.survey.security.AuthUser;
 import in.gov.rera.citizen.survey.services.AllotteeTopicService;
 
 @PropertySource(ignoreResourceNotFound = true, value = "classpath:message/common.properties")
@@ -52,9 +57,16 @@ public class AllotteeTopicRestController {
 	}
 
 	@PostMapping("/save")
-	public ResponseEntity<?> saveBankDtl(@RequestBody AllotteeForumTopicModel allotteeModel) throws ResourceNotFoundException{
+	public ResponseEntity<?> saveBankDtl(@RequestBody AllotteeForumTopicModel allotteeModel, HttpServletRequest req) throws ResourceNotFoundException{
 		    Optional.ofNullable(allotteeModel)
 						.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+		    AuthUser user = (AuthUser) req.getAttribute(AuthSecurity.AUTH_USER_ATTR);
+		    allotteeModel.setCreaterId(user.getUserId());
+		    allotteeModel.setCreaterName(user.getUserName());
+		    allotteeModel.setCreatedBy(String.valueOf(user.getUserId()));
+		    allotteeModel.setCreaterEmailId(user.getEmail());
+		    allotteeModel.setCreaterMobile(user.getMobile());
+		    allotteeModel.setCreaterType(user.getUserType());
 		    allotteeModel = allotteeServ.saveTopicForum(allotteeModel);
 		    ResponseModel rs = new ResponseModel();
 			rs.setMessage("Data sbmitted Successfully.");

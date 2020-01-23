@@ -86,6 +86,7 @@ public class CitizenClaimModel {
 		this.citizenClaimId = citizenClaimId;
 	}
 
+
 	public Long getProjectId() {
 		return projectId;
 	}

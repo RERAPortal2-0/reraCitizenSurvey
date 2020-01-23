@@ -65,6 +65,17 @@ public class AllotteeForumTopicModel {
 	@Column(name="CREATER_EMAILID")
 	private String createrEmailId;
 	
+	@Column(name="CREATER_MOBILE")
+	private String createrMobile;
+	
+	public String getCreaterMobile() {
+		return createrMobile;
+	}
+
+	public void setCreaterMobile(String createrMobile) {
+		this.createrMobile = createrMobile;
+	}
+
 	public String getCreaterType() {
 		return createrType;
 	}

@@ -11,4 +11,5 @@ public interface CitizenClaimDao extends CrudRepository<CitizenClaimModel , Long
 	CitizenClaimModel findByAllotteekyc(String kycId);
 	List<CitizenClaimModel> findByProjectId(Long projectId);
 	List<CitizenClaimModel> findByUserType(String processType);
+	List<CitizenClaimModel> findByProjectRegNo(String projectRegNo);
 }

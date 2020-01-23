@@ -90,5 +90,10 @@ public class CitizenClaimServiceImpl implements CitizenClaimService {
 
 	}
 
+	@Override
+	public List<CitizenClaimModel> findByProjectRegNo(String projectRegNo) {
+		return citizenDao.findByProjectRegNo(projectRegNo);
+	}
+
 
 }

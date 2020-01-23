@@ -169,7 +169,7 @@ public class CitizenClaimRestController {
 		Optional.of(list).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		for(CitizenClaimModel m:list)
 		{
-			if(m.getUserId().equals(userId) && m.getUserType().equals(userType))
+			if(userId.equals(m.getUserId()) && userType.equals(m.getUserType()))
 			{
 				newList.add(m);
 			}
@@ -203,35 +203,72 @@ public class CitizenClaimRestController {
 
 	
 	@PostMapping("/save-allottee-details")
-	public ResponseEntity<?> saveAllotteeDetails(@RequestBody List<FormThreeAnnxrTrxModel> projectList) throws ResourceNotFoundException {
-		Optional.ofNullable(projectList).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
-		for(FormThreeAnnxrTrxModel m: projectList)
-		{
-			List<CitizenClaimModel> citizenList = service.findByProjectId(m.getProjectId());
-			for(FormThreeAlloModel alo:m.getAllolist())
+	public ResponseEntity<?> saveAllotteeDetails(@RequestBody FormThreeAnnxrTrxModel project) throws ResourceNotFoundException {
+		
+		System.out.println("save allottee details called::::::::::::>>>>>>>>>>>");
+		System.out.println("saveAllotteeDetails called and allottee list size is "+project.getAllolist());
+		
+		
+		Optional.ofNullable(project).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+		
+		try {
+
+			System.out.println("SaveAllotteeDetails Project Id is::::::::>>>>>>>>> "+project.getProjectId());
+			List<CitizenClaimModel> citizenList = service.findByProjectId(project.getProjectId());
+			System.out.println("existing citizen List size is::::::::::::>>>>>>>>>>>>>>>>>>> "+citizenList.size());
+			if(citizenList.size()>0) {
+			for(FormThreeAlloModel alo:project.getAllolist())
 			{
 				int flag=0;
 				for(CitizenClaimModel model :citizenList)
 				{
-					if(!model.getProjectId().equals(m.getProjectId()) && !model.getBlockName().equals(alo.getBlockName()) && 
-					!model.getFlatNumber().equals(alo.getFlatNumber()) && 
-					!model.getAllotteekyc().equals(alo.getAllotteekyc()))
+					if(model.getProjectId().equals(project.getProjectId()) &&
+					model.getBlockName().equals(alo.getBlockName()) && 
+					model.getFlatNumber().equals(alo.getFlatNumber()) && 
+					!(alo.getAllotteekyc().equals(model.getAllotteekyc()) ||  "null".equals(model.getAllotteekyc())))
 					{
-						flag=1;
+						model.setAllotteekyc(alo.getAllotteekyc());
+						model.setAfsStatus(null);
+						model.setAllotteeName(null);
+						model.setUserId(null);
+						model.setUserType(null);
+						service.save(model);
+					}
+					else if(model.getProjectId().equals(project.getProjectId()) &&
+							!model.getBlockName().equals(alo.getBlockName()))
+					{
+						CitizenClaimModel newModel = new CitizenClaimModel();
+						newModel.setAllotteekyc(alo.getAllotteekyc());
+						newModel.setBlockName(alo.getBlockName());
+						newModel.setProjectId(project.getProjectId());
+						newModel.setProjectRegNo(project.getProjectReg());
+						newModel.setFlatNumber(alo.getFlatNumber());
+						newModel.setMobileNumber(alo.getMobileNumber());
+						service.save(newModel);
 					}
 				}
-				if(flag==1)
+			}
+			}
+			else
+			{
+				System.out.println("Inside New allottee Details :::::::::::::::::>>>>>>>>>>>>>>>> ");
+				for(FormThreeAlloModel alo:project.getAllolist())
 				{
-					CitizenClaimModel newModel = new CitizenClaimModel();
-					newModel.setAllotteekyc(alo.getAllotteekyc());
-					newModel.setBlockName(alo.getBlockName());
-					newModel.setProjectId(m.getProjectId());
-					newModel.setProjectRegNo(m.getProjectReg());
-					newModel.setFlatNumber(alo.getFlatNumber());
-					newModel.setMobileNumber(alo.getMobileNumber());
-					service.save(newModel);
+					System.out.println("Inside save allottee Details:::::::::::>>>>>>>>>>>>>>>>>>  ");
+				CitizenClaimModel newModel = new CitizenClaimModel();
+				newModel.setAllotteekyc(alo.getAllotteekyc());
+				newModel.setBlockName(alo.getBlockName());
+				newModel.setProjectId(project.getProjectId());
+				newModel.setProjectRegNo(project.getProjectReg());
+				newModel.setFlatNumber(alo.getFlatNumber());
+				newModel.setMobileNumber(alo.getMobileNumber());
+				service.save(newModel);
 				}
 			}
+		}
+		catch(Exception e)
+		{
+			System.out.println("Exception in saveAllotteeDetails :::::::::::>>>>>>>>>>>>>>>>>>>>>"+e);
 		}
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Data submitted Successfully.");
@@ -260,12 +297,12 @@ public class CitizenClaimRestController {
 			throws ResourceNotFoundException {
 		Optional.ofNullable(model).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
 		CitizenClaimModel returnModel=  null;
-		List<CitizenClaimModel> kycList = service.findByProjectId(model.getProjectId());
+		List<CitizenClaimModel> kycList = service.findByProjectRegNo(model.getProjectRegNo());
 		if (kycList.size()> 0) {
 			System.out.println("inside list:::::::::::::::::::");
 			for (CitizenClaimModel m : kycList) {
-				if (m.getAllotteekyc().equalsIgnoreCase(model.getAllotteekyc()) && m.getBlockName().equalsIgnoreCase(model.getBlockName())
-						&& m.getFlatNumber().equalsIgnoreCase(model.getFlatNumber())) {
+				if (model.getAllotteekyc().equalsIgnoreCase(m.getAllotteekyc()) && model.getBlockName().equalsIgnoreCase(m.getBlockName())
+						&& model.getFlatNumber().equalsIgnoreCase(m.getFlatNumber())) {
 					returnModel=new CitizenClaimModel();
 					returnModel = m;
 				}

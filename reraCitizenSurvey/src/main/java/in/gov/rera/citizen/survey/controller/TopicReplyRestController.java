@@ -5,6 +5,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,8 @@ import in.gov.rera.citizen.survey.common.model.ResponseModel;
 import in.gov.rera.citizen.survey.exception.ResourceNotFoundException;
 import in.gov.rera.citizen.survey.model.AllotteeForumTopicModel;
 import in.gov.rera.citizen.survey.model.TopicReplyModel;
+import in.gov.rera.citizen.survey.security.AuthSecurity;
+import in.gov.rera.citizen.survey.security.AuthUser;
 import in.gov.rera.citizen.survey.services.AllotteeTopicService;
 import in.gov.rera.citizen.survey.services.TopicReplyService;
 
@@ -54,9 +59,15 @@ public class TopicReplyRestController {
 	}
 
 	@PostMapping("/save")
-	public ResponseEntity<?> saveTopicReply(@RequestBody TopicReplyModel replyModel) throws ResourceNotFoundException{
+	public ResponseEntity<?> saveTopicReply(@RequestBody TopicReplyModel replyModel, HttpServletRequest req) throws ResourceNotFoundException{
 		    Optional.ofNullable(replyModel)
 						.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+		    AuthUser user = (AuthUser) req.getAttribute(AuthSecurity.AUTH_USER_ATTR);
+		    replyModel.setReplierName(user.getUserName());
+		    replyModel.setReplierId(String.valueOf(user.getUserId()));
+		    replyModel.setReplierType(user.getUserType());
+		    replyModel.setReplierEmail(user.getEmail());
+		    replyModel.setReplierMobileNo(user.getMobile());
 		    replyModel = replyServ.saveTopicReply(replyModel);
 		    ResponseModel rs = new ResponseModel();
 			rs.setMessage("Records Saved.");

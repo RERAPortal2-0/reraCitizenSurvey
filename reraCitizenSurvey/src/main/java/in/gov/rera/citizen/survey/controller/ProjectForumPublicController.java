@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.ResourceAccessException;
@@ -33,7 +34,7 @@ public class ProjectForumPublicController {
 	@Autowired
 	Environment env;
 
-	@GetMapping("/save") 
+	@PostMapping("/save") 
 	  public ResponseEntity<?> saveOrUpdateProjectForum(@RequestBody ProjectForumModel model) throws Exception {
 		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ProjectForumModel oldModel = pForumService.findByProjectId(model.getProjectId()); 

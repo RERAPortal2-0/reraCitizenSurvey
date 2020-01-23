@@ -6,6 +6,14 @@ public class FormThreeAnnxrTrxModel {
 	
 	private Long formThreeId;
 	private String projectReg;
+	private String projectName;
+	
+	public String getProjectName() {
+		return projectName;
+	}
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
 	private Long projectId;
 	private List<FormThreeAlloModel> allolist;
 	
