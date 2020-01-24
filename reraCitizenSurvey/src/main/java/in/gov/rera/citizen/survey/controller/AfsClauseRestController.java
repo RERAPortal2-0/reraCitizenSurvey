@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.ResourceAccessException;
 import in.gov.rera.citizen.survey.common.model.ResponseModel;
+import in.gov.rera.citizen.survey.constants.ReraConstants;
 import in.gov.rera.citizen.survey.exception.ResourceNotFoundException;
 import in.gov.rera.citizen.survey.model.AfsClauseModel;
 import in.gov.rera.citizen.survey.services.AfsClauseService;
@@ -28,7 +27,6 @@ import in.gov.rera.citizen.survey.services.AfsClauseService;
 @RestController
 @RequestMapping("/citizen_survey/secure/afs-clause")
 public class AfsClauseRestController {
-	private static final Logger logger = LogManager.getLogger(AfsClauseRestController.class);
 
 	@Autowired
 	AfsClauseService afsService;
@@ -37,13 +35,13 @@ public class AfsClauseRestController {
 	Environment env;
 
 	@GetMapping("/get-all")
-	public ResponseEntity<?> getAllAfsList() throws ResourceNotFoundException, IOException, ParseException {
+	public ResponseEntity<ResponseModel> getAllAfsList() throws ResourceNotFoundException, IOException, ParseException {
 		List<AfsClauseModel> list = afsService.findAll();
-		Optional.of(list).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		Optional.of(list).orElseThrow(() -> new ResourceAccessException(ReraConstants.NOT_FOUND));
 		ResponseModel rs = new ResponseModel();
-		if(list.size()>0)
+		if(!list.isEmpty())
 		{
-			rs.setMessage("Records found.");
+			rs.setMessage("Records found");
 		}
 		else
 		{
@@ -55,11 +53,10 @@ public class AfsClauseRestController {
 	}
 
 	@GetMapping("/get-by-id{id}")
-	public ResponseEntity<?> getAfsDetailsById(@PathVariable(value = "id") Long id)
+	public ResponseEntity<ResponseModel> getAfsDetailsById(@PathVariable(value = "id") Long id)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called id is " + id);
 		AfsClauseModel model = afsService.findById(id);
-		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		Optional.of(model).orElseThrow(() -> new ResourceAccessException(ReraConstants.NOT_FOUND));
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Records found.");
 		rs.setStatus("200");
@@ -68,11 +65,10 @@ public class AfsClauseRestController {
 	}
 
 	@GetMapping("/get-by-code/{clauseCode}")
-	public ResponseEntity<?> getAfsDetailsByclauseCode(@PathVariable(value = "clauseCode") String clauseCode)
+	public ResponseEntity<ResponseModel> getAfsDetailsByclauseCode(@PathVariable(value = "clauseCode") String clauseCode)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called clauseCode is " + clauseCode);
 		AfsClauseModel model = afsService.findByClauseCode(clauseCode);
-		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		Optional.of(model).orElseThrow(() -> new ResourceAccessException(ReraConstants.NOT_FOUND));
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Records found.");
 		rs.setStatus("200");
@@ -81,10 +77,10 @@ public class AfsClauseRestController {
 	}
 	
 	@PostMapping("/save")
-	public ResponseEntity<?> saveAfsClause(@RequestBody AfsClauseModel model)
+	public ResponseEntity<ResponseModel> saveAfsClause(@RequestBody AfsClauseModel model)
 			throws ResourceNotFoundException {
 		Optional.ofNullable(model)
-				.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+				.orElseThrow(() -> new ResourceNotFoundException(ReraConstants.NOT_FOUND));
 		   if(model.getAfsClauseId()==null) {
 		    model = afsService.saveAfs(model);
 		    model.setClauseCode(afsService.generateClauseCode(model.getAfsClauseId()));
@@ -93,8 +89,7 @@ public class AfsClauseRestController {
 		   }
 		   else
 		   {
-			 AfsClauseModel oldModel=new AfsClauseModel();
-			 oldModel=  afsService.findById(model.getAfsClauseId());
+			 AfsClauseModel oldModel=  afsService.findById(model.getAfsClauseId());
 			 oldModel.setClauseDtl(model.getClauseDtl());
              model = afsService.saveAfs(oldModel);
 		   }
@@ -106,10 +101,10 @@ public class AfsClauseRestController {
 	}
 
 	@PostMapping("/delete{id}")
-	public ResponseEntity<?> deleteBankDtl(@PathVariable(value = "id") Long id)
+	public ResponseEntity<ResponseModel> deleteBankDtl(@PathVariable(value = "id") Long id)
 			throws ResourceNotFoundException {
 		Optional.ofNullable(id)
-				.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
+				.orElseThrow(() -> new ResourceNotFoundException(ReraConstants.NOT_FOUND));
 		afsService.deleteById(id);
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Records Deleted.");

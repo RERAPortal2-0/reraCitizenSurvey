@@ -2,12 +2,9 @@ package in.gov.rera.citizen.survey.controller;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +40,10 @@ public class AllotteeTopicRestController {
 	Environment env;
 
 	@GetMapping("/all-topic{projectId}")
-	public ResponseEntity<?> getAllProjectTopic(@PathVariable(value = "projectId") Long projectId)
+	public ResponseEntity<ResponseModel> getAllProjectTopic(@PathVariable(value = "projectId") Long projectId)
 			throws ResourceNotFoundException, IOException, ParseException {
-		logger.debug("called id is " + projectId);
-		List<AllotteeForumTopicModel> allotteeList = new ArrayList<AllotteeForumTopicModel>();
-		allotteeList = allotteeServ.findByProjectId(projectId, env.getProperty("URL_PROJECT_REG"));
+		logger.debug("called id is ");
+		List<AllotteeForumTopicModel> allotteeList = allotteeServ.findByProjectId(projectId, env.getProperty("URL_PROJECT_REG"));
 		Optional.of(allotteeList).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Record found.");
@@ -57,7 +53,7 @@ public class AllotteeTopicRestController {
 	}
 
 	@PostMapping("/save")
-	public ResponseEntity<?> saveBankDtl(@RequestBody AllotteeForumTopicModel allotteeModel, HttpServletRequest req) throws ResourceNotFoundException{
+	public ResponseEntity<ResponseModel> saveBankDtl(@RequestBody AllotteeForumTopicModel allotteeModel, HttpServletRequest req) throws ResourceNotFoundException{
 		    Optional.ofNullable(allotteeModel)
 						.orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
 		    AuthUser user = (AuthUser) req.getAttribute(AuthSecurity.AUTH_USER_ATTR);

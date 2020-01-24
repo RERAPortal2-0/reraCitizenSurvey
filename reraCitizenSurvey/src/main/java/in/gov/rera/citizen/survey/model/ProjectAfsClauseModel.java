@@ -33,7 +33,7 @@ public class ProjectAfsClauseModel {
 	@Column(name = "ACTION")
 	private String action;
 
-	@Column(name = "CLAUSE_DTL",length=2000)
+	@Column(name = "CLAUSE_DTL",columnDefinition = "NVARCHAR(MAX)")
 	private String clauseDtl;
 	
 	@Column(name = "AUTHORITY_STATUS")

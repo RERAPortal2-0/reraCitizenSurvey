@@ -29,7 +29,7 @@ public class AfsClauseModel implements Serializable {
 	@Column(name = "CLAUSE_NAME")
 	private String clauseName;
 
-	@Column(name = "CLAUSE_DETAIL", length=2000)
+	@Column(name = "CLAUSE_DETAIL",columnDefinition = "NVARCHAR(MAX)")
 	private String clauseDtl;
 
 	@CreationTimestamp

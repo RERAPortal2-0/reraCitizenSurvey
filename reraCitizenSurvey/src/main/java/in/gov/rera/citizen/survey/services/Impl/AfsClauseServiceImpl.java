@@ -2,8 +2,6 @@ package in.gov.rera.citizen.survey.services.Impl;
 
 import java.util.List;
 import javax.transaction.Transactional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -18,7 +16,6 @@ import in.gov.rera.citizen.survey.services.AfsClauseService;
 @Transactional
 public class AfsClauseServiceImpl implements AfsClauseService {
 
-	private static final Logger logger = LogManager.getLogger(AfsClauseServiceImpl.class);
 	@Autowired
 	AfsClauseDao afsDao;
 	
@@ -52,15 +49,13 @@ public class AfsClauseServiceImpl implements AfsClauseService {
 	@Override
 	public String generateClauseCode(Long id)
 	{
-		String code= "CL"+id;
-		return code;
+		return "CL"+id;
 	}
 	
 	@Override
 	public String generateClauseName(Long id)
 	{
-		String name= "CLAUSE-"+id;
-		return name;
+		return "CLAUSE-"+id;
 	}
 
 	@Override

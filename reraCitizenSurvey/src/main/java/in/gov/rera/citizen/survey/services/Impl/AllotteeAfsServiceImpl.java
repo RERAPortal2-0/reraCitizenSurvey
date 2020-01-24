@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -33,6 +31,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
+
 import in.gov.rera.citizen.survey.common.RestTamplateUtility;
 import in.gov.rera.citizen.survey.dao.AfsClauseDao;
 import in.gov.rera.citizen.survey.model.AllotteeAfsDtlModel;
@@ -48,7 +47,6 @@ import in.gov.rera.citizen.survey.services.CitizenClaimService;
 @Transactional
 public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 
-	private static final Logger logger = LogManager.getLogger(AllotteeAfsServiceImpl.class);
 	@Autowired
 	AfsClauseDao afsDao;
 
@@ -186,7 +184,7 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 			 * table.addCell(cell); document.add(table);
 			 */
 			
-			String qrCodeText = project.getProjectDetailsModel().getProjectName() + ",\n" + chModel.getAllotteeName()
+			String qrCodeText = project.getProjRegNo() + ",\n" + chModel.getAllotteeName()
 					+ ",\n" + chModel.getBlockName()+",\n" + chModel.getFlatNumber() + ",\n" + chModel.getAllotteekyc();
 			BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrCodeText, 1000, 1000, null);
 			Image codeQrImage = barcodeQRCode.getImage();
@@ -238,7 +236,10 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 			if (chModel.getAllotteeName() != null) {
 				table2.addCell(createCellByAlignRight("Allottee Name : " + chModel.getAllotteeName()));
 			}
-			
+			else
+			{
+				table2.addCell(createCellByAlignRight(" "));
+			}
 			if (project.getPromoterType() != null) {
 				table2.addCell(new Phrase("Promoter Type : " + project.getPromoterType(),smallBold));
 			}
@@ -286,11 +287,9 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 				canvas1.restoreState();
 				
 				PdfContentByte canvas = writer.getDirectContent();
-				//canvas1 = writer.getDirectContent();
 				
 				Rectangle rect = new Rectangle(20, 20, 580, 830);
 				rect.setBorder(Rectangle.BOX); //
-				//rect.setBorderColor(new BaseColor(192, 0, 0));
 				rect.setBorderColor(BaseColor.GRAY);
 				rect.setBorderWidth(2);
 				canvas.rectangle(rect);

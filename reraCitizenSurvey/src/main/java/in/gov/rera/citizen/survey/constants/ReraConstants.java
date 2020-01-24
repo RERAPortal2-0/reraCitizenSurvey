@@ -20,7 +20,9 @@ public class ReraConstants {
 	public static final String PROJECT_ALT = "PROJECT_ALT";
 	public static final String PROJECT_USER = "PROJECT";
 	public static final String PROJECT_OTHER_PROMOTER = "PROJECT_OTHER_PROMOTER";
+	public static final String NOT_FOUND = "No any content found.";
 	
+	//
 	public static final String AGENT_USER = "AGENT";
 	public static final String OPERATOR_USER = "OPERATOR";
 	public static final String AUTHORITY_USER = "AUTHORITY";
@@ -176,7 +178,6 @@ public class ReraConstants {
 	public static final String HEARING_IN_PROGRESS = "HEARING_IN_PROGRESS";
 	public static final String JUDGEMENT_PASS = "JUDGEMENT_PASS";
 	public static final String CLOSED = "CLOSED";
-//	public static final String DISCARDED = "DISCARDED";
 	public static final String DISMISSED = "DISMISSED";
 	public static final String ASSIGN_TO = "ASSIGN_TO";
 	

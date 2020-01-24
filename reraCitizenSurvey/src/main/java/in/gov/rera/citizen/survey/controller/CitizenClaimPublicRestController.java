@@ -39,23 +39,25 @@ public class CitizenClaimPublicRestController {
 
 	
 	@PostMapping("/save-allottee-details")
-	public ResponseEntity<?> saveAllotteeDetails(@RequestBody FormThreeAnnxrTrxModel project) throws ResourceNotFoundException {
+	public ResponseEntity<ResponseModel> saveAllotteeDetails(@RequestBody FormThreeAnnxrTrxModel project) throws ResourceNotFoundException {
 		
-		System.out.println("save allottee details called::::::::::::>>>>>>>>>>>");
-		System.out.println("saveAllotteeDetails called and allottee list size is "+project.getAllolist());
+		logger.debug("save allottee details called::::::::::::>>>>>>>>>>>");
+		logger.debug("saveAllotteeDetails called and allottee list size is "+project.getAllolist());
 		
 		
 		Optional.ofNullable(project).orElseThrow(() -> new ResourceNotFoundException(env.getProperty("DATA_INVALID")));
 		
 		try {
 
-			System.out.println("SaveAllotteeDetails Project Id is::::::::>>>>>>>>> "+project.getProjectId());
+			logger.debug("SaveAllotteeDetails Project Id is::::::::>>>>>>>>> "+project.getProjectId());
 			List<CitizenClaimModel> citizenList = service.findByProjectId(project.getProjectId());
-			System.out.println("existing citizen List size is::::::::::::>>>>>>>>>>>>>>>>>>> "+citizenList.size());
-			if(citizenList.size()>0) {
+			logger.debug("existing citizen List size is::::::::::::>>>>>>>>>>>>>>>>>>> "+citizenList.size());
+			if(!citizenList.isEmpty()) {
 			for(FormThreeAlloModel alo:project.getAllolist())
 			{
 				int flag=0;
+				
+				CitizenClaimModel oldModel=new CitizenClaimModel();
 				for(CitizenClaimModel model :citizenList)
 				{
 					if(model.getProjectId().equals(project.getProjectId()) &&
@@ -63,35 +65,47 @@ public class CitizenClaimPublicRestController {
 					model.getFlatNumber().equals(alo.getFlatNumber()) && 
 					!(alo.getAllotteekyc().equals(model.getAllotteekyc()) ||  "null".equals(model.getAllotteekyc())))
 					{
-						model.setAllotteekyc(alo.getAllotteekyc());
-						model.setAfsStatus(null);
-						model.setAllotteeName(null);
-						model.setUserId(null);
-						model.setUserType(null);
-						service.save(model);
+						flag=1;
+						oldModel=model;
+						break;
 					}
 					else if(model.getProjectId().equals(project.getProjectId()) &&
 							!model.getBlockName().equals(alo.getBlockName()))
 					{
-						CitizenClaimModel newModel = new CitizenClaimModel();
-						newModel.setAllotteekyc(alo.getAllotteekyc());
-						newModel.setBlockName(alo.getBlockName());
-						newModel.setProjectId(project.getProjectId());
-						newModel.setProjectRegNo(project.getProjectReg());
-						newModel.setFlatNumber(alo.getFlatNumber());
-						newModel.setMobileNumber(alo.getMobileNumber());
-						newModel.setProjectName(project.getProjectName());
-						service.save(newModel);
+					   flag=2;
+					   break;
 					}
+				}
+				
+				if(flag==1)
+				{
+					oldModel.setAllotteekyc(alo.getAllotteekyc());
+					oldModel.setAfsStatus(null);
+					oldModel.setAllotteeName(null);
+					oldModel.setUserId(null);
+					oldModel.setUserType(null);
+					service.save(oldModel);
+				}
+				else if(flag==2)
+				{
+					CitizenClaimModel newModel = new CitizenClaimModel();
+					newModel.setAllotteekyc(alo.getAllotteekyc());
+					newModel.setBlockName(alo.getBlockName());
+					newModel.setProjectId(project.getProjectId());
+					newModel.setProjectRegNo(project.getProjectReg());
+					newModel.setFlatNumber(alo.getFlatNumber());
+					newModel.setMobileNumber(alo.getMobileNumber());
+					newModel.setProjectName(project.getProjectName());
+					service.save(newModel);
 				}
 			}
 			}
 			else
 			{
-				System.out.println("Inside New allottee Details :::::::::::::::::>>>>>>>>>>>>>>>> ");
+				logger.debug("Inside New allottee Details :::::::::::::::::>>>>>>>>>>>>>>>> ");
 				for(FormThreeAlloModel alo:project.getAllolist())
 				{
-					System.out.println("Inside save allottee Details:::::::::::>>>>>>>>>>>>>>>>>>  ");
+					logger.debug("Inside save allottee Details:::::::::::>>>>>>>>>>>>>>>>>>  ");
 				CitizenClaimModel newModel = new CitizenClaimModel();
 				newModel.setAllotteekyc(alo.getAllotteekyc());
 				newModel.setBlockName(alo.getBlockName());
@@ -107,7 +121,7 @@ public class CitizenClaimPublicRestController {
 		}
 		catch(Exception e)
 		{
-			System.out.println("Exception in saveAllotteeDetails :::::::::::>>>>>>>>>>>>>>>>>>>>>"+e);
+			logger.debug("Exception in saveAllotteeDetails :::::::::::>>>>>>>>>>>>>>>>>>>>>"+e);
 		}
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Data submitted Successfully.");
