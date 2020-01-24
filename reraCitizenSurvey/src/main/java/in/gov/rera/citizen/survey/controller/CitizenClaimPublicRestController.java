@@ -63,18 +63,25 @@ public class CitizenClaimPublicRestController {
 					if(model.getProjectId().equals(project.getProjectId()) &&
 					model.getBlockName().equals(alo.getBlockName()) && 
 					model.getFlatNumber().equals(alo.getFlatNumber()) && 
-					!(alo.getAllotteekyc().equals(model.getAllotteekyc()) ||  "null".equals(model.getAllotteekyc())))
+					(null==model.getAllotteekyc() ||
+							null==alo.getAllotteekyc() || 
+							!alo.getAllotteekyc().equals(model.getAllotteekyc())))
 					{
+						System.out.println("inside flag 1::::::::::::::::::::::>>>>>>>>>>>>>>>");
 						flag=1;
 						oldModel=model;
 						break;
 					}
-					else if(model.getProjectId().equals(project.getProjectId()) &&
-							!model.getBlockName().equals(alo.getBlockName()))
-					{
-					   flag=2;
-					   break;
-					}
+						/*
+						 * else if(model.getProjectId().equals(project.getProjectId()) &&
+						 * !model.getBlockName().equals(alo.getBlockName())) {
+						 * System.out.println("inside flag 2::::::::::::::::::::::>>>>>>>>>>>>>>>");
+						 * flag=2; break; } else if(model.getProjectId().equals(project.getProjectId())
+						 * && model.getBlockName().equals(alo.getBlockName()) &&
+						 * !model.getFlatNumber().equals(alo.getFlatNumber()) ) {
+						 * System.out.println("inside flag 3::::::::::::::::::::::>>>>>>>>>>>>>>>");
+						 * flag=3; break; }
+						 */
 				}
 				
 				if(flag==1)
@@ -82,22 +89,21 @@ public class CitizenClaimPublicRestController {
 					oldModel.setAllotteekyc(alo.getAllotteekyc());
 					oldModel.setAfsStatus(null);
 					oldModel.setAllotteeName(null);
+					oldModel.setMobileNumber(alo.getMobileNumber());
 					oldModel.setUserId(null);
-					oldModel.setUserType(null);
+					oldModel.setUserType(null);	
 					service.save(oldModel);
 				}
-				else if(flag==2)
-				{
-					CitizenClaimModel newModel = new CitizenClaimModel();
-					newModel.setAllotteekyc(alo.getAllotteekyc());
-					newModel.setBlockName(alo.getBlockName());
-					newModel.setProjectId(project.getProjectId());
-					newModel.setProjectRegNo(project.getProjectReg());
-					newModel.setFlatNumber(alo.getFlatNumber());
-					newModel.setMobileNumber(alo.getMobileNumber());
-					newModel.setProjectName(project.getProjectName());
-					service.save(newModel);
-				}
+					/*
+					 * else if(flag==2 || flag==3) { CitizenClaimModel newModel = new
+					 * CitizenClaimModel(); newModel.setAllotteekyc(alo.getAllotteekyc());
+					 * newModel.setBlockName(alo.getBlockName());
+					 * newModel.setProjectId(project.getProjectId());
+					 * newModel.setProjectRegNo(project.getProjectReg());
+					 * newModel.setFlatNumber(alo.getFlatNumber());
+					 * newModel.setMobileNumber(alo.getMobileNumber());
+					 * newModel.setProjectName(project.getProjectName()); service.save(newModel); }
+					 */
 			}
 			}
 			else
@@ -121,7 +127,7 @@ public class CitizenClaimPublicRestController {
 		}
 		catch(Exception e)
 		{
-			logger.debug("Exception in saveAllotteeDetails :::::::::::>>>>>>>>>>>>>>>>>>>>>"+e);
+			System.out.println("Exception in saveAllotteeDetails :::::::::::>>>>>>>>>>>>>>>>>>>>>"+e);
 		}
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Data submitted Successfully.");
