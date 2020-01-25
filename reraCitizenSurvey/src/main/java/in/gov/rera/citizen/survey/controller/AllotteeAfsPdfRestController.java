@@ -45,8 +45,10 @@ public class AllotteeAfsPdfRestController {
 		    {
 		    	if(model.getStatus().equals(ReraConstants.APPROVED))
 		    	{
-		    		InputStream reraLogo=AllotteeAfsPdfRestController.class.getClassLoader().getResourceAsStream("static/images/RERA_Certificate_Logo.jpg");
-		   		    byte[] bt=new byte[reraLogo.available()];
+		    		InputStream reraLogo=AllotteeAfsPdfRestController.class.getClassLoader().getResourceAsStream("static/images/wmlogo.jpg");
+		    		//InputStream reraLogo=AllotteeAfsPdfRestController.class.getClassLoader().getResourceAsStream("http://15.206.175.42/assets/images/reralogo.jpg");
+		   		    System.out.println("image path is static/images/reralogo.jpg");
+		    		byte[] bt=new byte[reraLogo.available()];
 		   		    reraLogo.read(bt);
 		   		    reraLogo.close();
 		    		allotteeService.generateAllotteefsPdf(model,response,projetId,kycId,env.getProperty("URL_PROJECT_REG"),bt);

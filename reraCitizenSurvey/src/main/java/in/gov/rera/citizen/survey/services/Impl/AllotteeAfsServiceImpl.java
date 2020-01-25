@@ -184,8 +184,29 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 			 * table.addCell(cell); document.add(table);
 			 */
 			
-			String qrCodeText = project.getProjRegNo() + ",\n" + chModel.getAllotteeName()
-					+ ",\n" + chModel.getBlockName()+",\n" + chModel.getFlatNumber() + ",\n" + chModel.getAllotteekyc();
+			
+			
+					
+			String projectRegNo = chModel.getProjectRegNo()==null?"":chModel.getProjectRegNo();
+		    System.out.println("Project Reg no is "+projectRegNo);	
+		    
+		    String allotteeName = chModel.getAllotteeName()==null?"":chModel.getAllotteeName();
+		    System.out.println("Allottee Name is "+allotteeName);	
+		    
+		    String qrCodeText = projectRegNo;
+		    
+		    if(allotteeName!="")
+		    qrCodeText = qrCodeText==""?allotteeName:qrCodeText+ ",\n" + allotteeName;
+		    else
+		    {
+		    	 qrCodeText = qrCodeText==""?allotteeName:qrCodeText;
+		    }
+		    
+		    
+		    
+		    qrCodeText = qrCodeText+ ",\n" + chModel.getBlockName()+",\n" + chModel.getFlatNumber() + ",\n" + chModel.getAllotteekyc();
+			
+			
 			BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrCodeText, 1000, 1000, null);
 			Image codeQrImage = barcodeQRCode.getImage();
 			codeQrImage.scaleAbsolute(90, 90);
