@@ -202,10 +202,7 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 		    	 qrCodeText = qrCodeText==""?allotteeName:qrCodeText;
 		    }
 		    
-		    
-		    
 		    qrCodeText = qrCodeText+ ",\n" + chModel.getBlockName()+",\n" + chModel.getFlatNumber() + ",\n" + chModel.getAllotteekyc();
-			
 			
 			BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrCodeText, 1000, 1000, null);
 			Image codeQrImage = barcodeQRCode.getImage();
