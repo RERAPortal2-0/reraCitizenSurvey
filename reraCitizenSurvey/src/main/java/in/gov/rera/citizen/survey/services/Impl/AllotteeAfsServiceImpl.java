@@ -148,7 +148,7 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 			project = RestTamplateUtility.projectDtlP(projetId, property);
 			Optional.of(project).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		response.setContentType("application/pdf");
-		response.setHeader("Content-Disposition", "attachment;filename=" + chModel.getAllotteekyc()+strDate + ".pdf");
+		response.setHeader("Content-Disposition", "attachment;filename="+"AFS Document.pdf");
 		Font fontUL = new Font(Font.FontFamily.TIMES_ROMAN, 10f, Font.UNDERLINE);
 		Font itlaicfont = new Font(Font.FontFamily.TIMES_ROMAN, 11f, Font.ITALIC);
 			OutputStream out = response.getOutputStream();
@@ -278,10 +278,12 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 			if (chModel.getAllotteekyc() != null) {
 				table2.addCell(createCellByAlignRight("KYC No. : " + chModel.getAllotteekyc()));
 			}
-			table2.writeSelectedRows(0, -1,
-				    document.left(0),
-				    table2.getTotalHeight() + document.bottom(document.bottomMargin()),
-				    writer.getDirectContent());
+			/*
+			 * table2.writeSelectedRows(0, -1, document.left(0), table2.getTotalHeight() +
+			 * document.bottom(document.bottomMargin()), writer.getDirectContent());
+			 */
+			document.add(table2);
+			
 			document.close();
 			writer.close();
 		} catch (Exception e) {
