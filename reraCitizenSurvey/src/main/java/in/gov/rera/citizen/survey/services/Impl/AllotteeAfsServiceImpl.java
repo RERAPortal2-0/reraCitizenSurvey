@@ -31,7 +31,6 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
-
 import in.gov.rera.citizen.survey.common.RestTamplateUtility;
 import in.gov.rera.citizen.survey.dao.AfsClauseDao;
 import in.gov.rera.citizen.survey.model.AllotteeAfsDtlModel;
