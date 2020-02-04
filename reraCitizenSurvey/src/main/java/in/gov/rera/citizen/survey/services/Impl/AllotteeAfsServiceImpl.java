@@ -19,12 +19,14 @@ import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BarcodeQRCode;
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -168,23 +170,6 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 				document.add(p3);
 			}
 			
-			/*
-			 * PdfPTable table = new PdfPTable(4); PdfPCell cell = new PdfPCell(new
-			 * Phrase(" 1,1 "));
-			 * 
-			 * table.addCell(cell); PdfPCell cell23 = new PdfPCell(new
-			 * Phrase("multi 1,3 and 1,4")); cell23.setColspan(4); cell23.setRowspan(4);
-			 * table.addCell(cell23); cell = new PdfPCell(new Phrase(" 2,1 "));
-			 * 
-			 * table.addCell(cell); cell = new PdfPCell(new Phrase(" 2,1 "));
-			 * 
-			 * table.addCell(cell); cell = new PdfPCell(new Phrase(" 2,1 "));
-			 * 
-			 * table.addCell(cell); document.add(table);
-			 */
-			
-			
-			
 					
 			String projectRegNo = chModel.getProjectRegNo()==null?"":chModel.getProjectRegNo();
 		    System.out.println("Project Reg no is "+projectRegNo);	
@@ -289,6 +274,118 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 		}
 	}
 
+	
+	
+	
+	
+	
+	@Override
+	public void generateNoticeOne(ProjectAfsModel model, HttpServletResponse response, Long projetId, Long kycId,
+			String property, byte[] bt) {
+		Document document = new Document();
+		document.setPageSize(PageSize.A4);
+		document.setMargins(40, 40, 40, 40);
+        this.reraLogo=bt;
+	       Font marFont = FontFactory.getFont("static/font/ARIALUNI.TTF",BaseFont.IDENTITY_H,true);
+		try {
+			
+			Format f = new SimpleDateFormat("dd-MM-yyyy");
+			String strDate = f.format(new Date());
+			ProjectRegistrationModel project = new ProjectRegistrationModel();
+			project = RestTamplateUtility.projectDtlP(projetId, property);
+			Optional.of(project).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment;filename="+"AFS Document.pdf");
+			OutputStream out = response.getOutputStream();
+			PdfWriter writer = PdfWriter.getInstance(document, out);
+			writer.setPageEvent(new GreyBorder());
+			document.open();
+			Image image = Image.getInstance(AllotteeAfsServiceImpl.reraLogo);
+			 image.setAbsolutePosition(42f, 720f);
+		     image.scaleAbsolute(85, 80);
+			document.add(image);
+			
+			Paragraph h1 = new Paragraph("ગુજરાત રીયલ એસ્ટેટ રેગ્યુલેટરી ઓથોરીટી", marFont);
+			Paragraph h3 = new Paragraph("ચોથો માળ, સહયોગ સંકુલ,", marFont);
+			Paragraph  h4 = new Paragraph("સેકટર-૧૧, ગાંધીનગર – ૩૮૨૦૧૦", marFont);
+			Paragraph  h5 = new Paragraph("ટેલીફોન નંબર:- (૦૭૯)૨૩૨-૫૮૬૫૯", marFont);
+			Paragraph  h6 = new Paragraph("વેબ સાઈટ:- https://gujrera.gujarat.gov.in", marFont);
+			h1.setAlignment(Paragraph.ALIGN_RIGHT);
+			h3.setAlignment(Paragraph.ALIGN_RIGHT);
+			h4.setAlignment(Paragraph.ALIGN_RIGHT);
+			h5.setAlignment(Paragraph.ALIGN_RIGHT);
+			h6.setAlignment(Paragraph.ALIGN_RIGHT);
+			
+			document.add(h1);
+			document.add(h3);
+			document.add(h4);
+			document.add(h5);
+			document.add(h6);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p11= new Paragraph("ક્રમાંક:-ગુજરેરા/વહટ/વસુલાત/                                   /૨૦		       				તા.                        /     /૨૦",marFont);
+			document.add(p11);
+			
+			 PdfContentByte contentByte = writer.getDirectContent();
+		        Rectangle rectangleRegNo = new Rectangle(60, 632, 550, 610);// (L,,width,)
+				rectangleRegNo.setBorder(Rectangle.BOX);
+				contentByte.setColorStroke(BaseColor.BLACK);
+				rectangleRegNo.setBorderWidth(1);
+				contentByte.rectangle(rectangleRegNo);
+				document.add(Chunk.NEWLINE);
+				document.add(Chunk.NEWLINE);
+				Paragraph p20= new Paragraph("ગુજરાત જમીન મહેસુલ કાયદા કલમ ૧૫૨ મુજબની નોટીસ",marFont);
+				p20.setAlignment(Paragraph.ALIGN_CENTER);
+				document.add(p20);
+		
+			document.add(Chunk.NEWLINE);
+			Paragraph p12= new Paragraph("વિષય:- સચિવશ્રી ગુજરેરા ગાંધીનગરની બાકી નીકળતી રકમ રૂ.  <Penalty Amount> /- તથા સરચાર્જ \r\n" + 
+					"         રકમ રૂ. 		 /- કુલ રકમ 		/- ભરવા બાબત.\r\n" + 
+					"\r\n" + 
+					"સંદર્ભ:- સુઓ મોટો ફરીયાદ નં.  ___<Complaint Number>__  તા.    /      /૨૦___    તથા                                             હુકમ ક્રમાંક: ",marFont);
+			document.add(p12);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p13= new Paragraph("આથી તમોને જમીન મહેસુલ કાયદાની કલમ ૧૫૨ મુજબની નોટીસ આપતા જણાવવાનું કે, તમોએ ઉપરોક્ત વિષયમાં દર્શાવેલ રકમ જે તે ખાતામાં ભરપાઇ કફ્રેલ નથી જેથી આ રકમ વસુલ કરવા તે ખાતા તરફથી વસુલ કરવા હુકમ થઇ આવેલ હોઇ સખ્તાઇના ભારે ઇલાજો લેવા અત્રેની કચેરીને ફરજ થઇ પડેલ છે. સખ્તાઇના ભારે ઇલાજોમાં  જમીન મહેસુલ કાયદા કલમ ૧૫૪ મુજબની તમારી જંગમ મિલકત ટાંચમાં લઇ હરાજી કરી વસુલ કરવામાં આવેશે. અથવા જમીન મહેસુલ કાયદા કલમ ૧૫૫ મુજબ સ્થાવર મિલકત મિલકત ટાંચમાં લઇ હરાજી કરવામાં આવશે. ",marFont);
+			document.add(p13);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p14= new Paragraph("ઉપરોક્ત સખ્તાઇ ના પગલા આ કચેરીને લેવા ન પડે એ સારૂ આ નોટીસ મળેથી દિન-૭ માં ઓન લાઇન ચલણથી જમા કરાવી દેવા અગર નાણા ભરપાઇ કરેલ હોય પહોંચ અથવા ચલણ રજુ કરશો આ અંગે તમારે કોઇ પણ રજુઆત કરવાની હોય તો નીચે જણાવેલ તારીખે પુરાવા સાથે અત્રેની કચેરીમાં હાજર રહેવા નોંધ લેશો. ",marFont);
+			document.add(p14);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p15= new Paragraph("નોંધ : રૂબરૂ આવતી વખતે આ નોટીસ સાથે લેતા આવવી તેમજ સરચાર્જની રકમ અત્રેની કચેરીમાં રૂબરૂ લાવવાની રહેશે અથવા તેટલી રકમનો માન્ય બેંકનો ડ્રાફ્ટ થી મોકલી આપવાનો રહેશે. ",marFont);
+			document.add(p15);
+			document.add(Chunk.NEWLINE);
+			document.add(Chunk.NEWLINE);
+			document.add(Chunk.NEWLINE);
+			document.add(Chunk.NEWLINE);
+			Paragraph p16= new Paragraph("                 મામલતદાર\r\n" + 
+					" ગુજરાત રીઅલ એસ્ટેટ રેગ્યુલેટરી ઓથોરીટી\r\n" + 
+					"                  ગાંધીનગર\r\n" + 
+					"રજી.પો.એ.ડી.\r\n" + 
+					"પ્રતિ,\r\n" + 
+					"શ્રી\r\n" + 
+					"પ્રમોટર નામ...<Promoter Name>.............................\r\n" + 
+					"પ્રમોટર એડ્રેસ...<Promoter address with pincode>............\r\n" + 
+					"ઇ-મેઇલ:- .<Email address>....................... ",marFont);
+			document.add(p16);
+			
+			
+			document.close();
+			writer.close();
+		} catch (Exception e) {
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	class GreyBorder extends PdfPageEventHelper {
 
 		@Override
@@ -316,5 +413,339 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 				ex.printStackTrace();
 			}
 		}
+	}
+
+
+
+
+
+
+
+
+
+	@Override
+	public void generateNoticeTwo(ProjectAfsModel model, HttpServletResponse response, Long projetId, Long kycId,
+			String property, byte[] bt) {
+		Document document = new Document();
+		document.setPageSize(PageSize.A4);
+		document.setMargins(40, 40, 40, 40);
+        this.reraLogo=bt;
+	       Font marFont = FontFactory.getFont("static/font/ARIALUNI.TTF",BaseFont.IDENTITY_H,true);
+		try {
+			
+			Format f = new SimpleDateFormat("dd-MM-yyyy");
+			String strDate = f.format(new Date());
+			ProjectRegistrationModel project = new ProjectRegistrationModel();
+			project = RestTamplateUtility.projectDtlP(projetId, property);
+			Optional.of(project).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment;filename="+"AFS Document.pdf");
+			OutputStream out = response.getOutputStream();
+			PdfWriter writer = PdfWriter.getInstance(document, out);
+			writer.setPageEvent(new GreyBorder());
+			document.open();
+			Image image = Image.getInstance(AllotteeAfsServiceImpl.reraLogo);
+			 image.setAbsolutePosition(42f, 720f);
+		     image.scaleAbsolute(85, 80);
+			document.add(image);
+			
+			
+			
+			Paragraph h1 = new Paragraph("ગુજરાત રીયલ એસ્ટેટ રેગ્યુલેટરી ઓથોરીટી", marFont);
+			
+			Paragraph h3 = new Paragraph("ચોથો માળ, સહયોગ સંકુલ,", marFont);
+			Paragraph  h4 = new Paragraph("સેકટર-૧૧, ગાંધીનગર – ૩૮૨૦૧૦", marFont);
+			Paragraph  h5 = new Paragraph("ટેલીફોન નંબર:- (૦૭૯)૨૩૨-૫૮૬૫૯", marFont);
+			Paragraph  h6 = new Paragraph("વેબ સાઈટ:- https://gujrera.gujarat.gov.in", marFont);
+			
+			h1.setAlignment(Paragraph.ALIGN_RIGHT);
+			h3.setAlignment(Paragraph.ALIGN_RIGHT);
+			h4.setAlignment(Paragraph.ALIGN_RIGHT);
+			h5.setAlignment(Paragraph.ALIGN_RIGHT);
+			h6.setAlignment(Paragraph.ALIGN_RIGHT);
+			
+			document.add(h1);
+			document.add(h3);
+			document.add(h4);
+			document.add(h5);
+			document.add(h6);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p11= new Paragraph("ક્રમાંક:-ગુજરેરા/વહટ/વસુલાત/                                   /૨૦		       				તા.                        /     /૨૦",marFont);
+			document.add(p11);
+			
+			 PdfContentByte contentByte = writer.getDirectContent();
+		        Rectangle rectangleRegNo = new Rectangle(60, 632, 550, 610);// (L,,width,)
+				rectangleRegNo.setBorder(Rectangle.BOX);
+				contentByte.setColorStroke(BaseColor.BLACK);
+				rectangleRegNo.setBorderWidth(1);
+				contentByte.rectangle(rectangleRegNo);
+				document.add(Chunk.NEWLINE);
+				document.add(Chunk.NEWLINE);
+				Paragraph p20= new Paragraph("ગુજરાત જમીન મહેસુલ કાયદા કલમ ૧૫૪ મુજબની નોટીસ",marFont);
+				p20.setAlignment(Paragraph.ALIGN_CENTER);
+				document.add(p20);
+		
+			document.add(Chunk.NEWLINE);
+			Paragraph p12= new Paragraph("વિષય:- સચિવશ્રી ગુજરેરા ગાંધીનગરની બાકી નીકળતી રકમ રૂ. <Penalty Amount> /- તથા સરચાર્જ \r\n" + 
+					"         રકમ રૂ. 		 /- કુલ રકમ 		/- ભરવા બાબત.\r\n" + 
+					"\r\n" + 
+					"સંદર્ભ:- સુઓ મોટો ફરીયાદ નં. __<Complaint No>    તા.    /      /૨૦___    તથા                                             હુકમ ક્રમાંક: 				તા.     /    /૨૦___",marFont);
+			document.add(p12);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p13= new Paragraph("આથી તમોને જમીન મહેસુલ કાયદાની કલમ ૧૫૪,૧૫૫ નીચે નોટીસ આપતા જણાવવાનું કે, તમોએ ઉપરોક્ત વિષયની બાકી વસુલાત અન્વયે અત્રેની કચેરીથી તમોને જમીન મહેસુલ કાયદા કલમ ૧૫૨ મુજબની નોટીસ તા.   /    /૨૦___ થી આપવામાં આવેલ છે. ",marFont);
+			document.add(p13);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p14= new Paragraph("સબબ જમીન મહેસુલ કાયદા હેઠળ વસુલાતના સખ્તાઇના ઇલાજો લેવાની અત્રેની કચેરીને ના છુટકે ફરજ થઇ પડેલ છે. વસુલાતના સખ્તાઇના ભારે ઇલાજોમાં જમીન મહેસુલ કાયદાની કલમ- ૧૫૪ મુજબ તમારી જંગમ મિલ્કત ટાંચમાં લઇ હરાજી કરી રકમ વસુલાત કરવામાં આવશે અથવા જમીન મહેસુલ કાયદાની કલમ- ૧૫૫ મુજબ તમારી સ્થાવર મિલ્કત ટાંચમાં લઇ જાહેર હરાજી કરી રકમ વસુલ કરવામાં આવશે. તેમ જણાવેલ હતુ. તેમજ તા.   /     /૨૦____ ના રોજ રાખેલ જપ્તી સંદર્ભે આપેલ રૂબરૂ જવાબ મુજબ બાકી રહેતી રકમ સરચાર્જ સહિત તા.   /    /૨૦____ સુધી માં ભરપાઇ કરી આપવાની બાંહેધરી આપેલ હતી. તેમ છતા સદરહું રકમ ભરપાઇ કરવામાં નિષ્ફળ ગયેલ છો. અને યેનકેન પ્રકારે સદરહું રકમ ભરપાઇ કરવા માંગતા નથી તેમ સ્પષ્ટ પણે ફલીત થાય છે. ",marFont);
+			document.add(p14);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p15= new Paragraph("સબબ આપની બાકી રહેતી દંડની રકમ સરચાર્જ સહિત તા.    /     /૨૦____ સુધીમાં ભરપાઇ કરવા જણાવવામાં આવે છે. જો તેમ કરવામાં કસુર થશે તો ત્યાર પછી કોઇ પણ સમયે લેન્ડ રેવન્યુ કોડ.૧૫૪ મુજબ સુર્યોદયથી સુર્યાસ્ત સુધીમાં જંગમ મિલ્કત ટાંચમાં લઇ જાહેર હરાજી કરવામાં આવશે. જેની ગંભીર નોંધ લેવી.",marFont);
+			document.add(p15);
+			document.add(Chunk.NEWLINE);
+			document.add(Chunk.NEWLINE);
+			document.add(Chunk.NEWLINE);
+			document.add(Chunk.NEWLINE);
+			Paragraph p16= new Paragraph("                 મામલતદાર\r\n" + 
+					" ગુજરાત રીઅલ એસ્ટેટ રેગ્યુલેટરી ઓથોરીટી\r\n" + 
+					"                  ગાંધીનગર\r\n" + 
+					"રજી.પો.એ.ડી.\r\n" + 
+					"પ્રતિ,\r\n" + 
+					"શ્રી\r\n" + 
+					"પ્રમોટર નામ...<Promoter Name>.............................\r\n" + 
+					"પ્રમોટર એડ્રેસ...<Promoter address with pincode>............\r\n" + 
+					"ઇ-મેઇલ:- .<Email address>....................... ",marFont);
+			document.add(p16);
+			
+			
+			document.close();
+			writer.close();
+		} catch (Exception e) {
+		}
+		
+	}
+
+	@Override
+	public void generateNoticeThree(ProjectAfsModel model, HttpServletResponse response, Long projetId, Long kycId,
+			String property, byte[] bt) {
+		Document document = new Document();
+		document.setPageSize(PageSize.A4);
+		document.setMargins(40, 40, 40, 40);
+        this.reraLogo=bt;
+	       Font marFont = FontFactory.getFont("static/font/ARIALUNI.TTF",BaseFont.IDENTITY_H,true);
+		try {
+			
+			Format f = new SimpleDateFormat("dd-MM-yyyy");
+			String strDate = f.format(new Date());
+			ProjectRegistrationModel project = new ProjectRegistrationModel();
+			project = RestTamplateUtility.projectDtlP(projetId, property);
+			Optional.of(project).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment;filename="+"AFS Document.pdf");
+			OutputStream out = response.getOutputStream();
+			PdfWriter writer = PdfWriter.getInstance(document, out);
+			writer.setPageEvent(new GreyBorder());
+			document.open();
+			Image image = Image.getInstance(AllotteeAfsServiceImpl.reraLogo);
+			 image.setAbsolutePosition(42f, 720f);
+		     image.scaleAbsolute(85, 80);
+			document.add(image);
+			
+			
+			
+			Paragraph h1 = new Paragraph("ગુજરાત રીયલ એસ્ટેટ રેગ્યુલેટરી ઓથોરીટી", marFont);
+			
+			Paragraph h3 = new Paragraph("ચોથો માળ, સહયોગ સંકુલ,", marFont);
+			Paragraph  h4 = new Paragraph("સેકટર-૧૧, ગાંધીનગર – ૩૮૨૦૧૦", marFont);
+			Paragraph  h5 = new Paragraph("ટેલીફોન નંબર:- (૦૭૯)૨૩૨-૫૮૬૫૯", marFont);
+			Paragraph  h6 = new Paragraph("વેબ સાઈટ:- https://gujrera.gujarat.gov.in", marFont);
+			
+			h1.setAlignment(Paragraph.ALIGN_RIGHT);
+			h3.setAlignment(Paragraph.ALIGN_RIGHT);
+			h4.setAlignment(Paragraph.ALIGN_RIGHT);
+			h5.setAlignment(Paragraph.ALIGN_RIGHT);
+			h6.setAlignment(Paragraph.ALIGN_RIGHT);
+			
+			document.add(h1);
+			document.add(h3);
+			document.add(h4);
+			document.add(h5);
+			document.add(h6);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p11= new Paragraph("ક્રમાંક:-ગુજરેરા/વહટ/વસુલાત/                                   /૨૦		       				તા.                        /     /૨૦",marFont);
+			document.add(p11);
+			
+		
+		
+			document.add(Chunk.NEWLINE);
+			Paragraph p12= new Paragraph("વંચાણે લીધું : \r\n" + 
+					"(૧) પેનલ્ટી ફોર ક્વાર્ટરલી રીટર્ન ડિફોલ્ટરની યાદી \r\n" + 
+					"	(૨) આ કચેરીની નોટીસ ક્રમાંક : ગુજરેરા/વહટ/વસુલાત/	  /૨૦    તા.   /     /૨૦ \r\n" + 
+					"	(૩) રીયલ એસ્ટેટ (વિનિયમ અને વિકાસ) અધિનિયમ, ૨૦૧૬ ની કલમ-૪૦ \r\n" + 
+					"-:: હુકમ ::- \r\n" + 
+					"",marFont);
+			document.add(p12);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p13= new Paragraph("પ્રમોટરશ્રી ………<Name of Promoter>…… દ્વારા તેમના રીયલ એસ્ટેટ પ્રોજેક્ટ .......<Project name>.............. નું ધી રીયલ એસ્ટેટ (રેગ્યુલેશન એન્ડ ડેવલપમેન્ટ) એક્ટ, ૨૦૧૬ હેઠળ રજીસ્ટ્રેશન કરવામાં આવેલ છે. જેનો રજીસ્ટ્રેશન નંબર .......<Approval Number>.......... છે.  ",marFont);
+			document.add(p13);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p14= new Paragraph("ધી રીયલ એસ્ટેટ (રેગ્યુલેશન એન્ડ ડેવલપમેન્ટ) એક્ટ, ૨૦૧૬ ની કલમ-૧૧(૧)(ઈ) અને ગુજરાત રીયલ એસ્ટેટ (રેગ્યુલેશન એન્ડ ડેવલપમેન્ટ) રૂલ્સ, ૨૦૧૬ ના રૂલ-૧૦(ડી) ની જોગવાઈઓ તથા ગુજરેરાના તા.૧૫/૦૧/૨૦૧૮ ના ઓર્ડર-૫ ની સૂચનાઓનો ભંગ કરતાં રીયલ એસ્ટેટ (રેગ્યુલેશન એન્ડ ડેવલપમેન્ટ) એક્ટની કલમ-૬૩ મુજબ કાર્યવાહી શરૂ કરી આ કચેરીના તા………<Judgement Date>……. ના હુકમ નં. .. ………<Judgement Number>……... અન્વયે પ્રમોટરને રૂ. ..<Penalty Amt>.... (અંકે રૂપિયા .........<in words>........) નો દંડ કરી દંડની રકમ હુકમ તારીખથી દિન-૩૦ માં અથવા પ્રોજેક્ટ પૂર્ણ થવાની અંતિમ તારીખ બેમાંથી જે વહેલાં હોય ત્યાર સુધીમાં ઓનલાઈન ભરવા આદેશ કરવામાં આવેલ હતો.",marFont);
+			document.add(p14);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p15= new Paragraph("ઉપરોક્ત આદેશમાં નિર્દિષ્ટ કરેલ સમયમર્યાદામાં દંડની રકમ ભરપાઈ નહિ કરતાં આમુખ-(૧) માં મળેલ બાકીદારોની યાદીને ધ્યાને લઈ પ્રમોટર્સને બાકી દંડની રકમ નોટીસ મળ્યેથી દિન-૭ માં ઓનલાઈન ચલનથી જમા કરાવી અત્રે જાણ કરવા આમુખ-(૨) માં જણાવેલ રજી.એ.ડી. થી નોટીસ આપવામાં આવેલ હતી તથા તેઓએ આપેલ ઇ-મેઈલ એડ્રેસ પર પણ નોટીસ મોકલી આપવામાં આવેલ હતી. તેમ છતાં, બાકી રકમ ભરપાઈ નહિ કરતાં તેઓને ટેલિફોનિક સંદેશ દ્વારા પણ જાણ કરવામાં આવેલ હતી. .",marFont);
+			document.add(p15);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p16= new Paragraph("ઉપરની વિગતે પ્રમોટર્સને બાકી દંડની રકમ ભરવા નોટીસ આપવા છતાં બાકી દંડની રકમ ભરપાઈ કરવા માંગતા નથી તેમ સ્પષ્ટપણે ફલિત થાય છે અને એક્ટ તથા નિયમોની જોગવાઈઓનો સરેઆમ ભંગ કરેલ હોવાનું માનવાને પૂરતું કારણ જણાઈ આવે છે. ",marFont);
+			document.add(p16);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p17= new Paragraph("રીયલ એસ્ટેટ (વિનિયમ અને વિકાસ) અધિનિયમ, ૨૦૧૬ ની કલમ-૪૦ ની જોગવાઈ મુજબ જો કોઈ પ્રમોટર ઉપર લાદવામાં આવેલ વ્યાજ કે દંડ અથવા વળતર ચૂકવવામાં નિષ્ફળ નીવડે, તો એવા પ્રમોટર, એલોટી કે રીયલ એસ્ટેટ એજન્ટ પાસેથી જમીન મહેસૂલના લેણાંની રીતે કે નિયત કરાય તે રીતે તે વસુલ કરવાને પાત્ર રહેશે. ",marFont);
+			document.add(p17);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p18= new Paragraph("ઉપરોક્ત સમગ્ર હકીકત તથા અધિનિયમ-૨૦૧૬ ની કલમ-૪૦ ધ્યાને લેતાં પ્રમોટર્સ દ્વારા રીયલ એસ્ટેટ પ્રોજેક્ટ .....<Project Name>... મોજે. .....<Moje>.... તા. ....<Taluka>..... જી. .....<District>.... ના સર્વે નં. .......<Survey No.>......, ટી.પી. સ્કીમ નં. ....<TP No,>..... ફા. પ્લોટ નં. ..<FP No,>.... ક્ષેત્રફળ .....<Total Land Area>..... ની જમીન ઉપર તૈયાર થઈ રહેલ હોઈ તે જમીનના રેવન્યુ રેકર્ડમાં ગુજરાત રીયલ એસ્ટેટ રેગ્યુલેટરી ઓથોરીટી, ગાંધીનગરના રૂ.....<Penalty Amount>.......... (અંકે રૂપિયા ..........<Penalty amount in words>............) ના બોજા (ચાર્જ) ની નોંધ કરવા આથી હુકમ કરવામાં આવે છે. \r\n" + 
+					"	વધુમાં, સદરહુ બોજાની નોંધ મામલતદારશ્રી, ……………………… એ રેવન્યુ રેકર્ડ કરી નં. ૬ ની નોંધ આ કચેરીને સત્વરે મોકલી આપવા જણાવવામાં આવે છે. ",marFont);
+			document.add(p18);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p19= new Paragraph("સચિવ \r\n" + 
+					"ગુજરાત  રીયલ એસ્ટેટ રેગ્યુલેટરી ઓથોરીટી,\r\n" + 
+					"ગાંધીનગર\r\n" + 
+					"",marFont);
+			p19.setAlignment(Paragraph.ALIGN_CENTER);
+			document.add(p19);
+			document.add(Chunk.NEWLINE);
+			document.add(Chunk.NEWLINE);
+			Paragraph p20= new Paragraph("By R.P.A.D. \r\n" + 
+					"પ્રતિ, \r\n" + 
+					"પ્રમોટર નામ...<Promoter Name>.............................\r\n" + 
+					"પ્રમોટર એડ્રેસ...<Promoter address with pincode>............\r\n" + 
+					"ઇ-મેઇલ:- .<Email address>.......................",marFont);
+			document.add(p20);
+			
+			
+			document.add(Chunk.NEWLINE);
+			document.add(Chunk.NEWLINE);
+			Paragraph p21= new Paragraph("નકલ રવાના : \r\n" + 
+					"મામલતદારશ્રી, ………………………….., જી. .............................. તરફ ઉક્ત હુકમની નોંધ રેવન્યુ રેકર્ડમાં કરી અત્રે જાણ કરવા વિનંતી સહ. \r\n" + 
+					"નકલ સવિનય રવાના : \r\n" + 
+					"કલેક્ટરશ્રી, …………………. તરફ જાણ તથા જરૂરી કાર્યવાહી સારૂ. \r\n" + 
+					"",marFont);
+			document.add(p21);
+			
+			document.close();
+			writer.close();
+		} catch (Exception e) {
+		}
+		
+		
+	}
+
+	@Override
+	public void generateNoticeFour(ProjectAfsModel model, HttpServletResponse response, Long projetId, Long kycId,
+			String property, byte[] bt) {
+		Document document = new Document();
+		document.setPageSize(PageSize.A4);
+		document.setMargins(40, 40, 40, 40);
+        this.reraLogo=bt;
+	       Font marFont = FontFactory.getFont("static/font/ARIALUNI.TTF",BaseFont.IDENTITY_H,true);
+		try {
+			
+			Format f = new SimpleDateFormat("dd-MM-yyyy");
+			String strDate = f.format(new Date());
+			ProjectRegistrationModel project = new ProjectRegistrationModel();
+			project = RestTamplateUtility.projectDtlP(projetId, property);
+			Optional.of(project).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Disposition", "attachment;filename="+"AFS Document.pdf");
+			OutputStream out = response.getOutputStream();
+			PdfWriter writer = PdfWriter.getInstance(document, out);
+			writer.setPageEvent(new GreyBorder());
+			document.open();
+			Image image = Image.getInstance(AllotteeAfsServiceImpl.reraLogo);
+			 image.setAbsolutePosition(42f, 720f);
+		     image.scaleAbsolute(85, 80);
+			document.add(image);
+			
+			
+			
+			Paragraph h1 = new Paragraph("ગુજરાત રીયલ એસ્ટેટ રેગ્યુલેટરી ઓથોરીટી", marFont);
+			
+			Paragraph h3 = new Paragraph("ચોથો માળ, સહયોગ સંકુલ,", marFont);
+			Paragraph  h4 = new Paragraph("સેકટર-૧૧, ગાંધીનગર – ૩૮૨૦૧૦", marFont);
+			Paragraph  h5 = new Paragraph("ટેલીફોન નંબર:- (૦૭૯)૨૩૨-૫૮૬૫૯", marFont);
+			Paragraph  h6 = new Paragraph("વેબ સાઈટ:- https://gujrera.gujarat.gov.in", marFont);
+			
+			h1.setAlignment(Paragraph.ALIGN_RIGHT);
+			h3.setAlignment(Paragraph.ALIGN_RIGHT);
+			h4.setAlignment(Paragraph.ALIGN_RIGHT);
+			h5.setAlignment(Paragraph.ALIGN_RIGHT);
+			h6.setAlignment(Paragraph.ALIGN_RIGHT);
+			
+			document.add(h1);
+			document.add(h3);
+			document.add(h4);
+			document.add(h5);
+			document.add(h6);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p11= new Paragraph("ક્રમાંક:-ગુજરેરા/વહટ/વસુલાત/                                   /૨૦		       				તા.                        /     /૨૦",marFont);
+			document.add(p11);
+			
+		
+		
+			document.add(Chunk.NEWLINE);
+			Paragraph p12= new Paragraph("નોટીસ",marFont);
+			document.add(p12);
+			p12.setAlignment(Paragraph.ALIGN_CENTER);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p13= new Paragraph("આથી પ્રમોટર્સ/ડેવલપર્સશ્રી …………………<Name of Promoter>………………………………ને રીયલ એસ્ટેટ (નિયમન અને વિકાસ) અધિનયમ-૨૦૧૬ ની કલમ ૪૦(૧) તથા ગુજરાત રીયલ એસ્ટેટ (નિયમન અને વિકાસ) (રીયલ એસ્ટેટ નિયમનકારી સત્તા મંડળને લગતી બાબતો) નિયમો-૨૦૧૬ ના નિયમ-૯ ની જોગવાઇ અન્વયે આ નોટીસ આપી જણાવવામાં આવે છે કે ",marFont);
+			document.add(p13);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p14= new Paragraph("રીયલ એસ્ટેટ (નિયમન અને વિકાસ) અધિનયમ-૨૦૧૬ ની કલમ-પ તથા ગુજરાત રીયલ એસ્ટેટ (નિયમ અને વિકાસ) સામાન્ય નિયમો-૨૦૧૭ ના નિયમ-૩ તથા ૬ ની જોગવાઇ મુજબ આપના પ્રોજેકટ .<name of project>......... મોજે .........<Moje>..................તાલુકો......<Taluka>......... જીલ્લો .......<District>.......... ના સર્વે/બ્લોક નંબર.......<Survey Number>........ ટી.પી સ્કીમ નંબર .......<TP No>......... ફાઇનલ પ્લોટ નંબર ........<FP No.>...... ક્ષેત્રફળ ...<Total land area>......ચો.મી ની જમીન ઉપર મંજુર કરી રેરા રજી.નં ………<RERA registration number>………. તા…<Date of Registration>……………….થી નોધણી કરવામા આવેલ છે",marFont);
+			document.add(p14);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p15= new Paragraph("સદરહું કાયદાની તથા નિયમોની જોગવાઇ મુજબ શરતોનું પાલન નહી કરતાં આ કચેરીના હુકમ નંબર.......< Judgement order number>.......................... તા......<Judgement Order Date>................. અન્વયે શરત ભંગ કરેલ હોવાનું સાબીત માની આપને /આપના પ્રોજેકટની કાર્યવાહી સંદર્ભે રુા ……<Penalty amount>……….. (અંકે રૂ. .........<Penalty amount in words>.........................................................)નો દંડ કરવામાં આવેલ છે અને સદરહું દંડનું ચલણ પણ ઓન લાઇન જનરેટ કરવામાં આવેલ છે.સદરહુ દંડની રકમ હુકમમાં જણાવ્યા મુજબ નિયત સમયમાં ભરપાઇ કરેલ નથી જે ઘણી ગંભીર બાબત છે અને ઓથોરીટીના હુકમનો અનાદર કરવામાં આવેલ છે તેમ માનવાને પુરતુ કારણ છે.",marFont);
+			document.add(p15);
+			document.add(Chunk.NEWLINE);
+			
+			Paragraph p16= new Paragraph("સબબ આપની બાકી રકમ આ નોટીસ મળેથી દિન-૭ માં ઓન લાઇન ચલણથી જમા કરાવી અત્રે જાણ કરવા નોંધ લેશો. જો તેમ કરવામાં કસુર થશે તો અધિનિયમની કલમ-૪૦ અથવા નિયમોના નિયમ-૯ અન્વયે સદરહું રકમ જમીન મહેસુલ ની બાકી રકમ ગણી ગુજરાત જમીન મહેસુલ.સંહિતા-૧૮૭૯ ની જોગવાઇઓ મુજબ વસુલાતની કાર્યવાહી કરવામાં આવશે. તેમજ સદરહું રકમના બોજાની નોંધ રેવન્યુ રેકર્ડમાં કરાવવા આગળની કાર્યવાહી કરવામાં આવશે ત્યાર બાદ આપની કોઇ રજુઆત ધ્યાને લેવામાં આવશે નહી. જેની નોંધ લેવી ",marFont);
+			document.add(p16);
+			document.add(Chunk.NEWLINE);
+			
+			
+			document.add(Chunk.NEWLINE);
+			
+	
+			Paragraph p20= new Paragraph("...<Digital Sign>..\r\n" + 
+					"      સચિવ\r\n" + 
+					"By R.P.A.D.                                                                                ગુજરાત રીયલ એસ્ટેટ રેગ્યુલેટરી ઓથોરીટી\r\n" + 
+					"                                                                                        ગાંધીનગર\r\n" + 
+					"પ્રતિ,\r\n" + 
+					"શ્રી\r\n" + 
+					"પ્રમોટર નામ...<Promoter Name>.............................\r\n" + 
+					"પ્રમોટર એડ્રેસ...<Promoter address with pincode>............\r\n" + 
+					"ઇ-મેઇલ:- .<Email address>.......................\r\n" + 
+					"",marFont);
+			document.add(p20);
+			
+			
+			
+			
+			document.close();
+			writer.close();
+		} catch (Exception e) {
+		}
+		
 	}
 }

@@ -20,4 +20,16 @@ public interface AllotteeAfsService {
 	AllotteeAfsDtlModel findByKycId(String kycId);
 
 	void generateAllotteefsPdf(ProjectAfsModel model,HttpServletResponse response, Long projetId, Long kycId, String property, byte[] bt);
+
+	void generateNoticeOne(ProjectAfsModel model, HttpServletResponse response, Long projetId, Long kycId,
+			String property, byte[] bt);
+
+	void generateNoticeTwo(ProjectAfsModel model, HttpServletResponse response, Long projetId, Long kycId,
+			String property, byte[] bt);
+
+	void generateNoticeThree(ProjectAfsModel model, HttpServletResponse response, Long projetId, Long kycId,
+			String property, byte[] bt);
+
+	void generateNoticeFour(ProjectAfsModel model, HttpServletResponse response, Long projetId, Long kycId,
+			String property, byte[] bt);
 }

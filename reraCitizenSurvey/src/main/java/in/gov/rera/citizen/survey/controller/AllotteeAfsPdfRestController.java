@@ -58,6 +58,85 @@ public class AllotteeAfsPdfRestController {
 			rs.setMessage("Pdf Generated");
 			rs.setStatus("200");
 			rs.setData("");
-		
+	}
+	
+	/*
+	 *   Gujarati Complaint Pdf
+	 * 
+	 */
+	
+	@GetMapping("/download-notice-one/{projetId}/{kycId}")
+	public void getNoticeOnePdfDtlById(@PathVariable("projetId")Long projetId,@PathVariable("kycId") Long kycId,
+			HttpServletResponse response)
+			throws Exception {
+		    List<ProjectAfsModel>  afsList = afsService.findByProjectId(projetId);
+		    for(ProjectAfsModel model:afsList)
+		    {
+		    		InputStream reraLogo=AllotteeAfsPdfRestController.class.getClassLoader().getResourceAsStream("static/images/wmlogo.jpg");
+		    		byte[] bt=new byte[reraLogo.available()];
+		   		    reraLogo.read(bt);
+		   		    reraLogo.close();
+		    		allotteeService.generateNoticeOne(model,response,projetId,kycId,env.getProperty("URL_PROJECT_REG"),bt);
+		    }
+			ResponseModel rs = new ResponseModel();
+			rs.setMessage("Pdf Generated");
+			rs.setStatus("200");
+			rs.setData("");
+	}
+	
+	@GetMapping("/download-notice-two/{projetId}/{kycId}")
+	public void getNoticeTwoPdfDtlById(@PathVariable("projetId")Long projetId,@PathVariable("kycId") Long kycId,
+			HttpServletResponse response)
+			throws Exception {
+		    List<ProjectAfsModel>  afsList = afsService.findByProjectId(projetId);
+		    for(ProjectAfsModel model:afsList)
+		    {
+		    		InputStream reraLogo=AllotteeAfsPdfRestController.class.getClassLoader().getResourceAsStream("static/images/wmlogo.jpg");
+		    		byte[] bt=new byte[reraLogo.available()];
+		   		    reraLogo.read(bt);
+		   		    reraLogo.close();
+		    		allotteeService.generateNoticeTwo(model,response,projetId,kycId,env.getProperty("URL_PROJECT_REG"),bt);
+		    }
+			ResponseModel rs = new ResponseModel();
+			rs.setMessage("Pdf Generated");
+			rs.setStatus("200");
+			rs.setData("");
+	}
+	@GetMapping("/download-notice-three/{projetId}/{kycId}")
+	public void getNoticeThreePdfDtlById(@PathVariable("projetId")Long projetId,@PathVariable("kycId") Long kycId,
+			HttpServletResponse response)
+			throws Exception {
+		    List<ProjectAfsModel>  afsList = afsService.findByProjectId(projetId);
+		    for(ProjectAfsModel model:afsList)
+		    {
+		    		InputStream reraLogo=AllotteeAfsPdfRestController.class.getClassLoader().getResourceAsStream("static/images/wmlogo.jpg");
+		    		byte[] bt=new byte[reraLogo.available()];
+		   		    reraLogo.read(bt);
+		   		    reraLogo.close();
+		    		allotteeService.generateNoticeThree(model,response,projetId,kycId,env.getProperty("URL_PROJECT_REG"),bt);
+		    }
+			ResponseModel rs = new ResponseModel();
+			rs.setMessage("Pdf Generated");
+			rs.setStatus("200");
+			rs.setData("");
+	}
+	
+	@GetMapping("/download-notice-four/{projetId}/{kycId}")
+	public void getNoticeFourPdfDtlById(@PathVariable("projetId")Long projetId,@PathVariable("kycId") Long kycId,
+			HttpServletResponse response)
+			throws Exception {
+		    List<ProjectAfsModel>  afsList = afsService.findByProjectId(projetId);
+		    for(ProjectAfsModel model:afsList)
+		    {
+		    		InputStream reraLogo=AllotteeAfsPdfRestController.class.getClassLoader().getResourceAsStream("static/images/wmlogo.jpg");
+		    		byte[] bt=new byte[reraLogo.available()];
+		   		    reraLogo.read(bt);
+		   		    reraLogo.close();
+		    		allotteeService.generateNoticeFour(model,response,projetId,kycId,env.getProperty("URL_PROJECT_REG"),bt);
+		    }
+			ResponseModel rs = new ResponseModel();
+			rs.setMessage("Pdf Generated");
+			rs.setStatus("200");
+			rs.setData("");
 	}
 }
