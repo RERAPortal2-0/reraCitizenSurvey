@@ -22,10 +22,8 @@ import org.springframework.web.client.ResourceAccessException;
 import in.gov.rera.citizen.survey.common.model.ResponseModel;
 import in.gov.rera.citizen.survey.constants.ReraConstants;
 import in.gov.rera.citizen.survey.exception.ResourceNotFoundException;
-import in.gov.rera.citizen.survey.model.AfsClauseModel;
 import in.gov.rera.citizen.survey.model.ProjectAfsClauseModel;
 import in.gov.rera.citizen.survey.model.ProjectAfsModel;
-import in.gov.rera.citizen.survey.services.AfsClauseService;
 import in.gov.rera.citizen.survey.services.ProjectAfsClauseService;
 import in.gov.rera.citizen.survey.services.ProjectAfsService;
 
@@ -92,7 +90,6 @@ public class ProjectAfsRestController {
 	public ResponseEntity<?> getProjectAfsLogDetailsByProjectId(@PathVariable(value = "projectId") Long projectId)
 			throws ResourceNotFoundException, IOException, ParseException {
 		List<ProjectAfsModel> list = afsService.findByAfsLogByProjectId(projectId);
-		System.out.println("project afs log list size is "+list.size());
 		List<ProjectAfsModel> logList = new ArrayList<ProjectAfsModel>();
 		ResponseModel rs = new ResponseModel();
 		for (int i = list.size() - 1; i >= 0; i--) {	
@@ -138,7 +135,7 @@ public class ProjectAfsRestController {
 			model = afsService.findById(model.getProjectAfsId());
 			int i = 0;
 			for (ProjectAfsClauseModel m : model.getAfsClauseList()) {
-				if (!"".equals(m.getAction())) {
+				if (!"".equals(m.getAction()) || null!=m.getAuthorityStatus()) {
 					i = 1;
 				}
 			}
@@ -156,13 +153,8 @@ public class ProjectAfsRestController {
 			isPresent.setStatus(ReraConstants.REVIEW);
 			isPresent.setAuthRemarks(model.getAuthRemarks());
 			isPresent = afsService.saveProjectAfs(isPresent);
-			
-			// model.getAfsClauseList()
-			// isPresent.getAfsClauseList();
-
 			ProjectAfsModel newModel = new ProjectAfsModel();
 			List<ProjectAfsClauseModel> newChlList = new ArrayList<>();
-			
 			newModel.setAfsLogId(isPresent.getProjectAfsId());
 			newModel.setAuthRemarks(isPresent.getAuthRemarks());
 			newModel.setMobileNo(isPresent.getMobileNo());
@@ -186,10 +178,8 @@ public class ProjectAfsRestController {
 			newModel = afsService.saveProjectAfs(newModel);
             long afsId = newModel.getProjectAfsId();
 			List<ProjectAfsClauseModel> newList2 = new ArrayList<>();
-			
 			for (ProjectAfsClauseModel m : model.getAfsClauseList()) {
 				for(ProjectAfsClauseModel m2:newModel.getAfsClauseList()) {
-					
 					if(m.getClauseCode().contentEquals(m2.getClauseCode())) {
 						m2.setAuthorityStatus(m.getAuthorityStatus());
 						newList2.add(m2);
@@ -197,22 +187,14 @@ public class ProjectAfsRestController {
 					}
 				}
 			}
-			
 			newList2.forEach(abc->{
-				
 				ProjectAfsClauseModel m = new ProjectAfsClauseModel();
 				m = chService.findById(abc.getProjectAfsClauseId());
 				m.setAuthorityStatus(abc.getAuthorityStatus());
 				m.setProjectAfsId(afsId);
 				System.out.println("Project afs fk is ::::::::::::>>>>>>>>>>>>>>>>>:::::::::: "+m.getProjectAfsId() );
 				chService.saveProjectAfsClause(m);
-				
 			});
-	
-			
-			
-			
-			
 		}
 		ResponseModel rs = new ResponseModel();
 		rs.setMessage("Data submitted Successfully.");

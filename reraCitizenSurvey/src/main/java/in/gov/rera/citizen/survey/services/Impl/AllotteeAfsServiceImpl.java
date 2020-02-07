@@ -169,7 +169,8 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 				p3.setAlignment(Paragraph.ALIGN_CENTER);
 				document.add(p3);
 			}
-			
+			document.add(Chunk.NEWLINE);
+			document.add(Chunk.NEWLINE);
 					
 			String projectRegNo = chModel.getProjectRegNo()==null?"":chModel.getProjectRegNo();
 		    System.out.println("Project Reg no is "+projectRegNo);	
@@ -190,8 +191,11 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 			
 			BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrCodeText, 1000, 1000, null);
 			Image codeQrImage = barcodeQRCode.getImage();
-			codeQrImage.scaleAbsolute(90, 90);
-			codeQrImage.setAlignment(Image.ALIGN_RIGHT);
+			codeQrImage.setAbsolutePosition(480f, 660f);
+			codeQrImage.scaleAbsolute(85, 80);
+			
+			//codeQrImage.scaleAbsolute(90, 90);
+			//codeQrImage.setAlignment(Image.ALIGN_RIGHT);
 			document.add(codeQrImage);
 			if (project.getProjectDetailsModel().getStateName() != null) {
 				Paragraph p5 = new Paragraph("State : " + project.getProjectDetailsModel().getStateName(), smallBold);
@@ -221,6 +225,7 @@ public class AllotteeAfsServiceImpl implements AllotteeAfsService {
 				ProjectAfsClauseModel m = model.getAfsClauseList().get(i);
 				String str = m.getClauseDtl();
 				str = str.replaceAll("\\<.*?\\>", "");
+				str = str.replace("&nbsp;"," ");
 				int j=i+1;
 				Paragraph p5 = new Paragraph((j) + ".  " + str, clauseFont);
 				p5.setAlignment(Paragraph.ALIGN_LEFT);
