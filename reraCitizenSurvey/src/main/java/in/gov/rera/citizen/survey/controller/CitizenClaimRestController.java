@@ -101,11 +101,18 @@ public class CitizenClaimRestController {
 	public ResponseEntity<ResponseModel> getAfsDetailsByclauseCode(@PathVariable(value = "kyc") String kyc)
 			throws ResourceNotFoundException, IOException, ParseException {
 		CitizenClaimModel model = service.findByKyc(kyc);
-		Optional.of(model).orElseThrow(() -> new ResourceAccessException(env.getProperty("NOT_FOUND")));
 		ResponseModel rs = new ResponseModel();
+		if(null!=model) {
 		rs.setMessage("Records found");
 		rs.setStatus("200");
 		rs.setData(model);
+		}
+		else
+		{
+		rs.setMessage("Records not found");
+		rs.setStatus("404");
+		rs.setData("");
+		}
 		return ResponseEntity.ok().body(rs);
 	}
 	
